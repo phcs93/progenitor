@@ -5,6 +5,7 @@ Simplex noise exploration with WebGL.
 https://phcs93.github.io/genesis/
 
 # TO-DO
+* resize canvas when window is resizes
 * add a seed parameter to the PRNG algorithm
 * remove shader code from index.html
 * remove "gl-matrix.js" depedency
