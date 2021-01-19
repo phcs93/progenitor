@@ -30,7 +30,7 @@ https://phcs93.github.io/genesis/
   * generators
   * selectors
   * modifiers
-* *randomize all parameters on startup*
+* **randomize all parameters on startup
 * import/export current seed, parameters and modules
 * animated 2D visualizer
 
