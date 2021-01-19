@@ -1,4 +1,4 @@
-# Dukefy
+# Genesis
 Simplex noise exploration with WebGL.
 
 # DEMO
