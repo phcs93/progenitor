@@ -1,4 +1,4 @@
-function Planet (resolution, gl, vertex, fragment) {
+function Planet (resolution, gl, vertex, fragment, alpha = false) {
 
     const sphere = new Sphere(resolution);
 
@@ -11,8 +11,14 @@ function Planet (resolution, gl, vertex, fragment) {
     this.z = 0; // not implemented
     this.angle = {x:0,y:0,z:0};
 
+    const alphaCallback = alpha ? () => gl.enable(gl.BLEND) : () => gl.disable(gl.BLEND);
+
     this.render = () => {
         
+        alphaCallback();
+        gl.blendEquation(gl.FUNC_ADD);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
         gl.useProgram(program);
 
         const positionBuffer = gl.createBuffer();
@@ -38,8 +44,8 @@ function Planet (resolution, gl, vertex, fragment) {
         const projectionLocation = gl.getUniformLocation(program, "projection");
         const projectionMatrix = glMatrix.mat4.create();
         glMatrix.mat4.perspective(projectionMatrix, 45 * Math.PI / 180, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100.0);
-        gl.uniformMatrix4fv(projectionLocation, false, projectionMatrix);          
-
+        gl.uniformMatrix4fv(projectionLocation, false, projectionMatrix);
+        
         gl.drawElements(gl.TRIANGLES, sphere.indexes.length, gl.UNSIGNED_INT, 0);
 
     };
