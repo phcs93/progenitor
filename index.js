@@ -7,8 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const gl = canvas.getContext("webgl2");
 
-    const planet = new Planet(250, gl, terrainVertexShaderSource, fragmentShaderSource);   
-    const ocean = new Planet(250, gl, oceanVertexShaderSource, fragmentShaderSource, true);
+    const terrain = new Sphere(100, gl, terrainVertexShaderSource, fragmentShaderSource);   
+    const ocean = new Sphere(100, gl, oceanVertexShaderSource, fragmentShaderSource, true);
+    const clouds = new Sphere(100, gl, cloudsVertexShaderSource, fragmentShaderSource, true);
 
     const render = () => {
 
@@ -21,11 +22,14 @@ document.addEventListener("DOMContentLoaded", () => {
         gl.clearDepth(1.0);
         gl.depthFunc(gl.LEQUAL);        
 
-        planet.angle.y -= 0.01;
-        planet.render();
+        terrain.angle.y -= 0.01;
+        terrain.render();
 
         ocean.angle.y -= 0.01;
         ocean.render();
+
+        clouds.angle.y -= 0.005;
+        clouds.render();
 
         window.requestAnimationFrame(render);
 
