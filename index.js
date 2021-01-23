@@ -5,11 +5,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const width = canvas.width = canvas.clientWidth;
     const height = canvas.height = canvas.clientHeight;
     
-    const gl = canvas.getContext("webgl2");
+    const gl = canvas.getContext("webgl2");    
 
-    const terrain = new Sphere(100, gl, terrainVertexShaderSource, fragmentShaderSource);   
-    const ocean = new Sphere(100, gl, oceanVertexShaderSource, fragmentShaderSource, true);
-    const clouds = new Sphere(100, gl, cloudsVertexShaderSource, fragmentShaderSource, true);
+    let time = 0.0;
+    let last = (Date.now() / 1000);
+
+    const terrain = new Sphere(1000, gl, terrainVertexShaderSource, fragmentShaderSource);
+    const ocean = new Sphere(1000, gl, oceanVertexShaderSource, fragmentShaderSource, true);
+    const clouds = new Sphere(1000, gl, cloudsVertexShaderSource, fragmentShaderSource, true);
 
     const render = () => {
 
@@ -22,14 +25,18 @@ document.addEventListener("DOMContentLoaded", () => {
         gl.clearDepth(1.0);
         gl.depthFunc(gl.LEQUAL);        
 
-        terrain.angle.y -= 0.01;
-        terrain.render();
+        terrain.angle.y -= 0.005;
+        terrain.render(time);
 
-        ocean.angle.y -= 0.01;
-        ocean.render();
+        ocean.angle.y -= 0.005;
+        ocean.render(time);
 
         clouds.angle.y -= 0.005;
-        clouds.render();
+        clouds.render(time);
+
+        var curr = (Date.now() / 1000);
+        time += curr - last;
+        last = curr;
 
         window.requestAnimationFrame(render);
 

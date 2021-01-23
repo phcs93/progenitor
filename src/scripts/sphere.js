@@ -2,6 +2,8 @@ function Sphere (resolution, gl, vertex, fragment, alpha = false) {
 
     const {positions, indexes} = createPositionsAndIndexes(resolution);
 
+    console.log(positions.length/3);
+
     const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertex);
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragment);
     const program = createProgram(gl, vertexShader, fragmentShader);
@@ -14,14 +16,19 @@ function Sphere (resolution, gl, vertex, fragment, alpha = false) {
     const alphaCallback = alpha ? () => gl.enable(gl.BLEND) : () => gl.disable(gl.BLEND);
 
     const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
     const indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indexes), gl.STATIC_DRAW);
 
+    const timeLocation = gl.getUniformLocation(program, "time");
     const positionLocation = gl.getAttribLocation(program, "position");
-
     const viewLocation = gl.getUniformLocation(program, "view");  
     const projectionLocation = gl.getUniformLocation(program, "projection");
 
-    this.render = () => {
+    this.render = (time) => {
         
         alphaCallback();
         gl.blendEquation(gl.FUNC_ADD);
@@ -30,10 +37,7 @@ function Sphere (resolution, gl, vertex, fragment, alpha = false) {
         gl.useProgram(program);
         
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indexes), gl.STATIC_DRAW);
 
         gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(positionLocation);
@@ -48,6 +52,8 @@ function Sphere (resolution, gl, vertex, fragment, alpha = false) {
         const projectionMatrix = glMatrix.mat4.create();
         glMatrix.mat4.perspective(projectionMatrix, 45 * Math.PI / 180, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100.0);
         gl.uniformMatrix4fv(projectionLocation, false, projectionMatrix);
+
+        gl.uniform1f(timeLocation, time);
         
         gl.drawElements(gl.TRIANGLES, indexes.length, gl.UNSIGNED_INT, 0);
 
