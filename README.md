@@ -14,7 +14,7 @@ https://phcs93.github.io/genesis/
   * fragment shader color enhancement 
 * render multiple objects
 * add lightning (star)
-  * normal maps? (probably not necessary since there are no textures in the scene)
+  * normal maps -> derivatives
 * render ocean as a separate geometry
   * add alpha channel for transparency
   * animate the ocean with 4D noise
@@ -36,6 +36,7 @@ https://phcs93.github.io/genesis/
 
 ## EXTRA
 * generate procedural audio
+* upload earth heightmap
 
 ## OUT OF SCOPE (for now)
 * render a solar system
