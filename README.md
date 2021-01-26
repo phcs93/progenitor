@@ -5,16 +5,10 @@ Simplex noise exploration with WebGL.
 https://phcs93.github.io/genesis/
 
 # TO-DO
-* remove cilinder from the center of the sphere
 * resize canvas when window is resizes
 * add a seed parameter to the PRNG algorithm
-* remove shader code from index.html
 * remove "gl-matrix.js" depedency
 * matcap texture?
-* analytical normals
-* animate the ocean with analytical derivatives
-* animate the ocean with analytical derivatives
-  * make clouds cast shadows
 * render rings
 * render gas giants (only clouds?)
 * render liquid giants (only ocean?)
