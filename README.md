@@ -21,6 +21,7 @@ https://phcs93.github.io/genesis/
 * render clouds as separate geometry
   * add alpha channel for transparency
   * animate clouds with inverse 4D noise
+* render rings
 * render gas giants (only clouds?)
 * render liquid giants (only ocean?)
 * add UI controls (mobile first?)
