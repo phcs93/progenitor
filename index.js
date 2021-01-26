@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const width = canvas.width = canvas.clientWidth;
     const height = canvas.height = canvas.clientHeight;
     
-    const gl = canvas.getContext("webgl2");    
+    const gl = canvas.getContext("webgl2");
 
     let time = 0.0;
     let last = (Date.now() / 1000);
@@ -26,12 +26,15 @@ document.addEventListener("DOMContentLoaded", () => {
         gl.depthFunc(gl.LEQUAL);        
 
         terrain.angle.y -= 0.005;
+        terrain.angle.z += Math.sin(time)/500.0;
         terrain.render(time);
 
         ocean.angle.y -= 0.005;
+        ocean.angle.z += Math.sin(time)/500.0;
         ocean.render(time);
 
         clouds.angle.y -= 0.005;
+        clouds.angle.z += Math.sin(time/2.0)/500.0;
         clouds.render(time);
 
         var curr = (Date.now() / 1000);

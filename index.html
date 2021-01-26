@@ -5,13 +5,20 @@
         <!-- lib -->
         <script type="application/javascript" src="lib/gl-matrix.js"></script>
 
+        <!-- common shaders -->
+        <script src="src/shaders/common/random.glsl"></script>
+        <script src="src/shaders/common/noise.glsl"></script>
+        <script src="src/shaders/common/fbm.glsl"></script>
+        <script src="src/shaders/common/turbulence.glsl"></script>
+        <script src="src/shaders/common/gradient.glsl"></script>
+
         <!-- vertex shaders -->
-        <script src="src/shaders/vertex/cloudsVertexShaderSource.vert"></script>
-        <script src="src/shaders/vertex/oceanVertexShaderSource.vert"></script>
-        <script src="src/shaders/vertex/terrainVertexShaderSource.vert"></script>
+        <script src="src/shaders/vertex/clouds.glsl"></script>
+        <script src="src/shaders/vertex/ocean.glsl"></script>
+        <script src="src/shaders/vertex/terrain.glsl"></script>
 
         <!-- fragment shader -->
-        <script src="src/shaders/fragment/fragmentShaderSource.frag"></script>
+        <script src="src/shaders/fragment/fragment.glsl"></script>
 
         <!-- scripts -->
         <script type="application/javascript" src="src/scripts/sphere.js"></script>
