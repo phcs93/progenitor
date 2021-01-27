@@ -11,6 +11,8 @@ function Sphere (resolution, gl, vertex, fragment, alpha = false) {
     this.z = -6;
     this.angle = {x:0,y:0,z:0};
 
+    this.gradient = [];
+
     const alphaCallback = alpha ? () => gl.enable(gl.BLEND) : () => gl.disable(gl.BLEND);
 
     const positionBuffer = gl.createBuffer();
@@ -22,9 +24,12 @@ function Sphere (resolution, gl, vertex, fragment, alpha = false) {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indexes), gl.STATIC_DRAW);
 
     const timeLocation = gl.getUniformLocation(program, "time");
+    const breakpointsLocation = gl.getUniformLocation(program, "breakpoints");
+    const colorsLocation = gl.getUniformLocation(program, "colors");
+
     const positionLocation = gl.getAttribLocation(program, "position");
-    const viewLocation = gl.getUniformLocation(program, "view");  
-    const normalLocation = gl.getUniformLocation(program, "normal");  
+    const viewLocation = gl.getUniformLocation(program, "view");
+    const normalLocation = gl.getUniformLocation(program, "normal");
     const projectionLocation = gl.getUniformLocation(program, "projection");
 
     this.render = time => {
@@ -58,6 +63,8 @@ function Sphere (resolution, gl, vertex, fragment, alpha = false) {
         gl.uniformMatrix4fv(projectionLocation, false, projectionMatrix);
 
         gl.uniform1f(timeLocation, time);
+        gl.uniform1fv(breakpointsLocation, this.gradient.map(c => c.value));
+        gl.uniform4fv(colorsLocation, this.gradient.map(c => c.color).reduce((acc, crr) => acc.concat(crr), []));
         
         gl.drawElements(gl.TRIANGLES, indexes.length, gl.UNSIGNED_INT, 0);
 
