@@ -1,5 +1,5 @@
 # Genesis
-Simplex noise exploration with WebGL.
+Procedural planet generation with WebGL.
 
 # DEMO
 https://phcs93.github.io/genesis/
