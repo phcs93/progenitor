@@ -14,12 +14,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // window.history.replaceState(null, null, url);
 
-    const canvas = document.querySelector("canvas");
+    const canvas = document.querySelector("canvas");    
 
     const width = canvas.width = canvas.clientWidth;
     const height = canvas.height = canvas.clientHeight;
     
-    const gl = canvas.getContext("webgl2");
+    const gl = canvas.getContext("webgl2", {
+        preserveDrawingBuffer: true,
+        premultipliedAlpha: true
+    });
 
     let time = 0.0;
     let last = (Date.now() / 1000);
@@ -42,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-        gl.clearColor(0, 0, 0, 0);
+        gl.clearColor(0, 0, 0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         gl.enable(gl.DEPTH_TEST);
