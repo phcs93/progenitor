@@ -26,6 +26,8 @@ https://phcs93.github.io/genesis/
 ## EXTRA
 * generate procedural audio
 * upload earth heightmap
+* twitter bot post planet gif every hour
+  * link to app with seed in url
 
 ## OUT OF SCOPE (for now)
 * render a solar system
