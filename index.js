@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const gl = canvas.getContext("webgl2", {
         preserveDrawingBuffer: true,
-        premultipliedAlpha: true
+        premultipliedAlpha: false
     });
 
     let time = 0.0;
