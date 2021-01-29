@@ -19,7 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const width = canvas.width = canvas.clientWidth;
     const height = canvas.height = canvas.clientHeight;
     
-    const gl = canvas.getContext("webgl2");
+    const gl = canvas.getContext("webgl2", {
+        preserveDrawingBuffer: true
+    });
 
     let time = 0.0;
     let last = (Date.now() / 1000);
