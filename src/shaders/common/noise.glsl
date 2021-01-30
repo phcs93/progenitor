@@ -6,7 +6,7 @@ const noiseSource = `
     float third = 0.3333333333333333;
 
     //vec4 permute (vec4 v) { return mod((v * 34.0 + 1.0) * v, 289.0); }
-    vec4 permute (vec4 v) { return mod((v * 34.0 + 1.0) * v, 289.0 + seed); }
+    vec4 permute (vec4 v) { return mod((v * 34.0 + 1.0 + seed) * v, 289.0); }
     vec4 taylor (vec4 v) { return 1.79284291400159 - v * 0.85373472095314; }
 
     vec4 noise (vec3 v) { // https://www.shadertoy.com/view/Ws23RD
