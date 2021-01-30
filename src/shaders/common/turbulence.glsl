@@ -15,7 +15,7 @@ const turbulenceSource = `
         float yd = v.y + (noise(vec3(x1, y1, z1)).w * 1.0);
         float zd = v.z + (noise(vec3(x2, y2, z2)).w * 1.0);
 
-        return fbm(vec3(xd,yd,zd), 8);
+        return fbm(vec3(xd,yd,zd), 4);
 
     }
 

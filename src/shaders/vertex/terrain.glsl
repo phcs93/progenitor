@@ -12,7 +12,7 @@ const terrainVertexShaderSource = `
 
     void main() {
         
-        vec4 s = fbm(position.xyz, 8);        
+        vec4 s = fbm(position.xyz, 5);        
         float v = s.w;
         color = gradient(v);
         v = (v/2.0)+1.5;
