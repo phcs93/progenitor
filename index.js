@@ -31,9 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let time = 0.0;
     let last = (Date.now() / 1000);
 
-    const terrain = new Sphere(100, gl, terrainVertexShaderSource, fragmentShaderSource);
-    const ocean = new Sphere(100, gl, oceanVertexShaderSource, fragmentShaderSource, true);
-    const clouds = new Sphere(100, gl, cloudsVertexShaderSource, fragmentShaderSource, true);
+    const terrain = new Sphere(500, gl, terrainVertexShaderSource, fragmentShaderSource);
+    const ocean = new Sphere(500, gl, oceanVertexShaderSource, fragmentShaderSource, true);
+    const clouds = new Sphere(500, gl, cloudsVertexShaderSource, fragmentShaderSource, true);
 
     terrain.gradient = [ 
         {value: 0.000, color: [0.018, 0.024, 0.057, 1.000]},
