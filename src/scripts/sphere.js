@@ -1,4 +1,4 @@
-function Sphere (resolution, gl, vertex, fragment, alpha = false) {
+function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
 
     const {positions, indexes} = createPositionsAndIndexes(resolution);
 
@@ -11,7 +11,7 @@ function Sphere (resolution, gl, vertex, fragment, alpha = false) {
     this.z = -6;
     this.angle = {x:0,y:0,z:0};
 
-    this.gradient = [];
+    const gradient = createRandomGradient(seed);
 
     const alphaCallback = alpha ? () => gl.enable(gl.BLEND) : () => gl.disable(gl.BLEND);
 
@@ -23,6 +23,7 @@ function Sphere (resolution, gl, vertex, fragment, alpha = false) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indexes), gl.STATIC_DRAW);
 
+    const seedLocation = gl.getUniformLocation(program, "seed");
     const timeLocation = gl.getUniformLocation(program, "time");
     const breakpointsLocation = gl.getUniformLocation(program, "breakpoints");
     const colorsLocation = gl.getUniformLocation(program, "colors");
@@ -62,9 +63,10 @@ function Sphere (resolution, gl, vertex, fragment, alpha = false) {
         glMatrix.mat4.perspective(projectionMatrix, 45 * Math.PI / 180, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100.0);
         gl.uniformMatrix4fv(projectionLocation, false, projectionMatrix);
 
+        gl.uniform1f(seedLocation, seed);
         gl.uniform1f(timeLocation, time);
-        gl.uniform1fv(breakpointsLocation, this.gradient.map(c => c.value));
-        gl.uniform4fv(colorsLocation, this.gradient.map(c => c.color).reduce((acc, crr) => acc.concat(crr), []));
+        gl.uniform1fv(breakpointsLocation, gradient.map(c => c.value));
+        gl.uniform4fv(colorsLocation, gradient.map(c => c.color).reduce((acc, crr) => acc.concat(crr), []));
         
         gl.drawElements(gl.TRIANGLES, indexes.length, gl.UNSIGNED_INT, 0);
 
@@ -104,6 +106,39 @@ function createPositionsAndIndexes (resolution) { // http://www.songho.ca/opengl
     }
 
     return {positions, indexes};
+
+}
+
+function createRandomGradient (seed) {
+
+    var LCG = s => () => (2**31-1&(s=Math.imul(48271,s)))/2**31;
+
+    var lcg = LCG(seed * Number.MAX_SAFE_INTEGER);
+
+    var size = ~~(lcg() * 30) + 2;
+    const gradient = [];
+
+    for (let i = 0; i < size; i++) {
+        gradient.push({
+            value: lcg(),
+            color: [lcg(),lcg(),lcg(),1.0]
+        });
+    }
+
+    gradient[0].value = 0.0;
+    gradient[size-1].value = 1.0;
+
+    return gradient;
+
+    // return [ 
+    //     {value: 0.000, color: [0.018, 0.024, 0.057, 1.000]},
+    //     {value: 0.400, color: [0.318, 0.224, 0.157, 1.000]},
+    //     {value: 0.500, color: [1.000, 1.000, 0.957, 1.000]},
+    //     {value: 0.600, color: [0.314, 0.718, 0.153, 1.000]},
+    //     {value: 0.700, color: [0.082, 0.247, 0.012, 1.000]},
+    //     {value: 0.900, color: [0.318, 0.224, 0.157, 1.000]},
+    //     {value: 1.000, color: [0.937, 0.937, 0.933, 1.000]}
+    // ];
 
 }
 
