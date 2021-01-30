@@ -1,7 +1,7 @@
 const gradientSource = `
 
-    uniform float[256] breakpoints;
-    uniform vec4[256] colors;
+    uniform float[32] breakpoints;
+    uniform vec4[32] colors;
 
     int[2] index (float breakpoint) {
         for (int i = 0; i < breakpoints.length()-1; i++) {

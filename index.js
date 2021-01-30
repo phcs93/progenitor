@@ -1,18 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // const url = new URL(window.location.href);
+    //const url = new URL(window.location.href);
 
-    // url.searchParams.set("seed", url.searchParams.get("seed") || Math.random());
+    //url.searchParams.set("seed", url.searchParams.get("seed") || Math.random());
 
-    // // const config = {
-    // //     seed: parseInt(url.searchParams.get("seed")) || Math.random()
-    // // };
+    // const config = {
+    //     seed: parseInt(url.searchParams.get("seed")) || Math.random()
+    // };
 
-    // // for (const p in config) {
-    // //     url.searchParams.set(p, config[p]);
-    // // }
+    // for (const p in config) {
+    //     url.searchParams.set(p, config[p]);
+    // }
 
-    // window.history.replaceState(null, null, url);
+    //window.history.replaceState(null, null, url);
 
     const canvas = document.querySelector("canvas");    
 
@@ -43,6 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
         {value: 1.000, color: [0.937, 0.937, 0.933, 1.000]}
     ];
 
+    var frames = 0;
+
     const render = () => {
 
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -71,6 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     };
 
-    render();
+    window.requestAnimationFrame(render);
 
 });
