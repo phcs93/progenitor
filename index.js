@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    //const url = new URL(window.location.href);
+    const url = new URL(window.location.href);
+
+    const bot = url.searchParams.get("bot");
 
     //url.searchParams.set("seed", url.searchParams.get("seed") || Math.random());
 
@@ -43,8 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
         {value: 1.000, color: [0.937, 0.937, 0.933, 1.000]}
     ];
 
-    var frames = 0;
-
     const render = () => {
 
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -69,10 +69,17 @@ document.addEventListener("DOMContentLoaded", () => {
         time += curr - last;
         last = curr;
 
-        window.requestAnimationFrame(render);
-
     };
 
-    window.requestAnimationFrame(render);
+    const loop = () => {        
+        window.requestAnimationFrame(render);
+        window.requestAnimationFrame(loop);
+    };
+
+    if (bot) {
+        window.requestAnimationFrame(render);
+    } else {
+        window.requestAnimationFrame(loop);
+    }
 
 });
