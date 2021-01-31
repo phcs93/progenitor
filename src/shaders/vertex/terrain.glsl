@@ -12,13 +12,14 @@ const terrainVertexShaderSource = `
 
     void main() {
 
-        vec4 s = fbm(position.xyz, 8);        
-        float v = s.w;
+        vec4 d = vec4(0.0);
+
+        float v = fbm(vec4(position.xyz, 0.0), d, 8);
         color = gradient(v);
         v = (v/2.0)+1.5;
         gl_Position = projection * view * vec4(position.xyz * v, position.w); 
 
-        vec3 normalized = vec3(normalize(position.xyz - (s.xyz * 0.45)));
+        vec3 normalized = vec3(normalize(position.xyz - (d.xyz * 0.45)));
         vec3 ambientLight = vec3(0.025, 0.025, 0.025);
         vec3 directionalLightColor = vec3(1, 1, 1);
         vec3 directionalVector = vec3(1.0, 0.0, 1.0);

@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let time = 0.0;
     let last = (Date.now() / 1000);
 
-    const resolution = bot ? 333 : 999;
+    const resolution = bot ? 300 : 500;
 
     const terrain = new Sphere(resolution, seed, gl, terrainVertexShaderSource, fragmentShaderSource);
     const ocean = new Sphere(resolution, seed*seed, gl, oceanVertexShaderSource, fragmentShaderSource, true);

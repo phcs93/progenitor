@@ -1,116 +1,265 @@
+// original -> http://staffwww.itn.liu.se/~stegu/aqsis/aqsis-newnoise/sdnoise1234.c
+
 const noiseSource = `
 
-    uniform float seed;
+uniform float seed;
 
-    float sixth = 0.1666666666666667;
-    float third = 0.3333333333333333;
+int[512] perm = int[512](
+    151,160,137,91,90,15,
+    131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
+    190, 6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,
+    88,237,149,56,87,174,20,125,136,171,168, 68,175,74,165,71,134,139,48,27,166,
+    77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,
+    102,143,54, 65,25,63,161, 1,216,80,73,209,76,132,187,208, 89,18,169,200,196,
+    135,130,116,188,159,86,164,100,109,198,173,186, 3,64,52,217,226,250,124,123,
+    5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,
+    223,183,170,213,119,248,152, 2,44,154,163, 70,221,153,101,155,167, 43,172,9,
+    129,22,39,253, 19,98,108,110,79,113,224,232,178,185, 112,104,218,246,97,228,
+    251,34,242,193,238,210,144,12,191,179,162,241, 81,51,145,235,249,14,239,107,
+    49,192,214, 31,181,199,106,157,184, 84,204,176,115,121,50,45,127, 4,150,254,
+    138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180,
+    151,160,137,91,90,15,
+    131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
+    190, 6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,
+    88,237,149,56,87,174,20,125,136,171,168, 68,175,74,165,71,134,139,48,27,166,
+    77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,
+    102,143,54, 65,25,63,161, 1,216,80,73,209,76,132,187,208, 89,18,169,200,196,
+    135,130,116,188,159,86,164,100,109,198,173,186, 3,64,52,217,226,250,124,123,
+    5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,
+    223,183,170,213,119,248,152, 2,44,154,163, 70,221,153,101,155,167, 43,172,9,
+    129,22,39,253, 19,98,108,110,79,113,224,232,178,185, 112,104,218,246,97,228,
+    251,34,242,193,238,210,144,12,191,179,162,241, 81,51,145,235,249,14,239,107,
+    49,192,214, 31,181,199,106,157,184, 84,204,176,115,121,50,45,127, 4,150,254,
+    138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180 
+);
 
-    //vec4 permute (vec4 v) { return mod((v * 34.0 + 1.0) * v, 289.0); }
-    vec4 permute (vec4 v) { return mod((v * 34.0 + 1.0 + seed) * v, 289.0); }
-    vec4 taylor (vec4 v) { return 1.79284291400159 - v * 0.85373472095314; }
 
-    vec4 noise (vec3 v) { // https://www.shadertoy.com/view/Ws23RD
+vec4[32] grad4lut = vec4[32](
+    vec4( 0.0, 1.0, 1.0, 1.0 ), vec4( 0.0, 1.0, 1.0, -1.0 ), vec4( 0.0, 1.0, -1.0, 1.0 ), vec4( 0.0, 1.0, -1.0, -1.0 ), // 32 tesseract edges
+    vec4( 0.0, -1.0, 1.0, 1.0 ), vec4( 0.0, -1.0, 1.0, -1.0 ), vec4( 0.0, -1.0, -1.0, 1.0 ), vec4( 0.0, -1.0, -1.0, -1.0 ),
+    vec4( 1.0, 0.0, 1.0, 1.0 ), vec4( 1.0, 0.0, 1.0, -1.0 ), vec4( 1.0, 0.0, -1.0, 1.0 ), vec4( 1.0, 0.0, -1.0, -1.0 ),
+    vec4( -1.0, 0.0, 1.0, 1.0 ), vec4( -1.0, 0.0, 1.0, -1.0 ), vec4( -1.0, 0.0, -1.0, 1.0 ), vec4( -1.0, 0.0, -1.0, -1.0 ),
+    vec4( 1.0, 1.0, 0.0, 1.0 ), vec4( 1.0, 1.0, 0.0, -1.0 ), vec4( 1.0, -1.0, 0.0, 1.0 ), vec4( 1.0, -1.0, 0.0, -1.0 ),
+    vec4( -1.0, 1.0, 0.0, 1.0 ), vec4( -1.0, 1.0, 0.0, -1.0 ), vec4( -1.0, -1.0, 0.0, 1.0 ), vec4( -1.0, -1.0, 0.0, -1.0 ),
+    vec4( 1.0, 1.0, 1.0, 0.0 ), vec4( 1.0, 1.0, -1.0, 0.0 ), vec4( 1.0, -1.0, 1.0, 0.0 ), vec4( 1.0, -1.0, -1.0, 0.0 ),
+    vec4( -1.0, 1.0, 1.0, 0.0 ), vec4( -1.0, 1.0, -1.0, 0.0 ), vec4( -1.0, -1.0, 1.0, 0.0 ), vec4( -1.0, -1.0, -1.0, 0.0)
+);
 
-        vec3 i  = floor(v + dot(v, vec3(third)));
-        vec3 p1 = v - i + dot(i, vec3(sixth));
+ivec4[64] simplex = ivec4[64](
+    ivec4(0,1,2,3),ivec4(0,1,3,2),ivec4(0,0,0,0),ivec4(0,2,3,1),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(1,2,3,0),
+    ivec4(0,2,1,3),ivec4(0,0,0,0),ivec4(0,3,1,2),ivec4(0,3,2,1),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(1,3,2,0),
+    ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),
+    ivec4(1,2,0,3),ivec4(0,0,0,0),ivec4(1,3,0,2),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(2,3,0,1),ivec4(2,3,1,0),
+    ivec4(1,0,2,3),ivec4(1,0,3,2),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(2,0,3,1),ivec4(0,0,0,0),ivec4(2,1,3,0),
+    ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),
+    ivec4(2,0,1,3),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(3,0,1,2),ivec4(3,0,2,1),ivec4(0,0,0,0),ivec4(3,1,2,0),
+    ivec4(2,1,0,3),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(3,1,0,2),ivec4(0,0,0,0),ivec4(3,2,0,1),ivec4(3,2,1,0)
+);
 
-        vec3 g = step(p1.yzx, p1.xyz);
-        vec3 l = 1.0 - g;
-        vec3 i1 = min(g.xyz, l.zxy);
-        vec3 i2 = max(g.xyz, l.zxy);
+void grad4 (int hash, out float gx, out float gy, out float gz, out float gw) {
+    int h = hash & 31;
+    gx = grad4lut[h][0];
+    gy = grad4lut[h][1];
+    gz = grad4lut[h][2];
+    gw = grad4lut[h][3];
+}
 
-        vec3 p2 = p1 - i1 + sixth;
-        vec3 p3 = p1 - i2 + third;
-        vec3 p4 = p1 - 0.5;
-        
-        vec4 ix = i.x + vec4(0.0, i1.x, i2.x, 1.0);
-        vec4 iy = i.y + vec4(0.0, i1.y, i2.y, 1.0);
-        vec4 iz = i.z + vec4(0.0, i1.z, i2.z, 1.0);
+float F4 = 0.309016994;
+float G4 = 0.138196601;
 
-        vec4 p = permute(permute(permute(iz)+iy)+ix);
+  float noise (float x, float y, float z, float w, out float dnoise_dx, out float dnoise_dy, out float dnoise_dz, out float dnoise_dw) {
+  
+      float n0, n1, n2, n3, n4; 
+      float noise; 
+      float gx0, gy0, gz0, gw0, gx1, gy1, gz1, gw1;
+      float gx2, gy2, gz2, gw2, gx3, gy3, gz3, gw3, gx4, gy4, gz4, gw4;
+      float t20, t21, t22, t23, t24;
+      float t40, t41, t42, t43, t44;
+      
+      float s = (x + y + z + w) * F4; 
+      float xs = x + s;
+      float ys = y + s;
+      float zs = z + s;
+      float ws = w + s;
+      int i = int(floor(xs));
+      int j = int(floor(ys));
+      int k = int(floor(zs));
+      int l = int(floor(ws));
+  
+      float t = float(i + j + k + l) * G4; 
+      float X0 = float(i) - t; 
+      float Y0 = float(j) - t;
+      float Z0 = float(k) - t;
+      float W0 = float(l) - t;
+  
+      float x0 = x - X0;  
+      float y0 = y - Y0;
+      float z0 = z - Z0;
+      float w0 = w - W0;
+  
+      int c1 = (x0 > y0) ? 32 : 0;
+      int c2 = (x0 > z0) ? 16 : 0;
+      int c3 = (y0 > z0) ? 8 : 0;
+      int c4 = (x0 > w0) ? 4 : 0;
+      int c5 = (y0 > w0) ? 2 : 0;
+      int c6 = (z0 > w0) ? 1 : 0;
+      int c = c1 | c2 | c3 | c4 | c5 | c6; 
+  
+      int i1, j1, k1, l1; 
+      int i2, j2, k2, l2; 
+      int i3, j3, k3, l3; 
+  
+      i1 = simplex[c][0]>=3 ? 1 : 0;
+      j1 = simplex[c][1]>=3 ? 1 : 0;
+      k1 = simplex[c][2]>=3 ? 1 : 0;
+      l1 = simplex[c][3]>=3 ? 1 : 0;
+      
+      i2 = simplex[c][0]>=2 ? 1 : 0;
+      j2 = simplex[c][1]>=2 ? 1 : 0;
+      k2 = simplex[c][2]>=2 ? 1 : 0;
+      l2 = simplex[c][3]>=2 ? 1 : 0;
+      
+      i3 = simplex[c][0]>=1 ? 1 : 0;
+      j3 = simplex[c][1]>=1 ? 1 : 0;
+      k3 = simplex[c][2]>=1 ? 1 : 0;
+      l3 = simplex[c][3]>=1 ? 1 : 0;
+  
+      float x1 = x0 - float(i1) + G4; 
+      float y1 = y0 - float(j1) + G4;
+      float z1 = z0 - float(k1) + G4;
+      float w1 = w0 - float(l1) + G4;
+      float x2 = x0 - float(i2) + 2.0 * G4; 
+      float y2 = y0 - float(j2) + 2.0 * G4;
+      float z2 = z0 - float(k2) + 2.0 * G4;
+      float w2 = w0 - float(l2) + 2.0 * G4;
+      float x3 = x0 - float(i3) + 3.0 * G4; 
+      float y3 = y0 - float(j3) + 3.0 * G4;
+      float z3 = z0 - float(k3) + 3.0 * G4;
+      float w3 = w0 - float(l3) + 3.0 * G4;
+      float x4 = x0 - 1.0 + 4.0 * G4; 
+      float y4 = y0 - 1.0 + 4.0 * G4;
+      float z4 = z0 - 1.0 + 4.0 * G4;
+      float w4 = w0 - 1.0 + 4.0 * G4;
+      
+      int ii = i & 0xff;
+      int jj = j & 0xff;
+      int kk = k & 0xff;
+      int ll = l & 0xff;
+  
+      float t0 = 0.6 - x0*x0 - y0*y0 - z0*z0 - w0*w0;
+      if(t0 < 0.0) n0 = t0 = t20 = t40 = gx0 = gy0 = gz0 = gw0 = 0.0;
+      else {
+        t20 = t0 * t0;
+        t40 = t20 * t20;
+        grad4(perm[ii+perm[jj+perm[kk+perm[ll]]]], gx0,gy0,gz0,gw0);
+        n0 = t40 * ( gx0 * x0 + gy0 * y0 + gz0 * z0 + gw0 * w0 );
+      }
+  
+     float t1 = 0.6 - x1*x1 - y1*y1 - z1*z1 - w1*w1;
+      if(t1 < 0.0) n1 = t1 = t21 = t41 = gx1 = gy1 = gz1 = gw1 = 0.0;
+      else {
+        t21 = t1 * t1;
+        t41 = t21 * t21;
+        grad4(perm[ii+i1+perm[jj+j1+perm[kk+k1+perm[ll+l1]]]], gx1,gy1,gz1,gw1);
+        n1 = t41 * ( gx1 * x1 + gy1 * y1 + gz1 * z1 + gw1 * w1 );
+      }
+  
+     float t2 = 0.6 - x2*x2 - y2*y2 - z2*z2 - w2*w2;
+      if(t2 < 0.0) n2 = t2 = t22 = t42 = gx2 = gy2 = gz2 = gw2 = 0.0;
+      else {
+        t22 = t2 * t2;
+        t42 = t22 * t22;
+        grad4(perm[ii+i2+perm[jj+j2+perm[kk+k2+perm[ll+l2]]]], gx2,gy2,gz2,gw2);
+        n2 = t42 * ( gx2 * x2 + gy2 * y2 + gz2 * z2 + gw2 * w2 );
+     }
+  
+     float t3 = 0.6 - x3*x3 - y3*y3 - z3*z3 - w3*w3;
+      if(t3 < 0.0) n3 = t3 = t23 = t43 = gx3 = gy3 = gz3 = gw3 = 0.0;
+      else {
+        t23 = t3 * t3;
+        t43 = t23 * t23;
+        grad4(perm[ii+i3+perm[jj+j3+perm[kk+k3+perm[ll+l3]]]], gx3,gy3,gz3,gw3);
+        n3 = t43 * ( gx3 * x3 + gy3 * y3 + gz3 * z3 + gw3 * w3 );
+      }
+  
+     float t4 = 0.6 - x4*x4 - y4*y4 - z4*z4 - w4*w4;
+      if(t4 < 0.0) n4 = t4 = t24 = t44 = gx4 = gy4 = gz4 = gw4 = 0.0;
+      else {
+        t24 = t4 * t4;
+        t44 = t24 * t24;
+        grad4(perm[ii+1+perm[jj+1+perm[kk+1+perm[ll+1]]]], gx4,gy4,gz4,gw4);
+        n4 = t44 * ( gx4 * x4 + gy4 * y4 + gz4 * z4 + gw4 * w4 );
+      }
+  
+      
+      noise = 27.0 * (n0 + n1 + n2 + n3 + n4);
+  
+      
+      // if( ( dnoise_dx != 0 ) && ( dnoise_dy != 0 ) && ( dnoise_dz != 0 ) && ( dnoise_dw != 0 ) )
+      //    {
+      /*  A straight, unoptimised calculation would be like:
+       *     *dnoise_dx = -8.0f * t20 * t0 * x0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gx0;
+       *    *dnoise_dy = -8.0f * t20 * t0 * y0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gy0;
+       *    *dnoise_dz = -8.0f * t20 * t0 * z0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gz0;
+       *    *dnoise_dw = -8.0f * t20 * t0 * w0 * dot(gx0, gy0, gz0, gw0, x0, y0, z0, w0) + t40 * gw0;
+       *    *dnoise_dx += -8.0f * t21 * t1 * x1 * dot(gx1, gy1, gz1, gw1, x1, y1, z1, w1) + t41 * gx1;
+       *    *dnoise_dy += -8.0f * t21 * t1 * y1 * dot(gx1, gy1, gz1, gw1, x1, y1, z1, w1) + t41 * gy1;
+       *    *dnoise_dz += -8.0f * t21 * t1 * z1 * dot(gx1, gy1, gz1, gw1, x1, y1, z1, w1) + t41 * gz1;
+       *    *dnoise_dw = -8.0f * t21 * t1 * w1 * dot(gx1, gy1, gz1, gw1, x1, y1, z1, w1) + t41 * gw1;
+       *    *dnoise_dx += -8.0f * t22 * t2 * x2 * dot(gx2, gy2, gz2, gw2, x2, y2, z2, w2) + t42 * gx2;
+       *    *dnoise_dy += -8.0f * t22 * t2 * y2 * dot(gx2, gy2, gz2, gw2, x2, y2, z2, w2) + t42 * gy2;
+       *    *dnoise_dz += -8.0f * t22 * t2 * z2 * dot(gx2, gy2, gz2, gw2, x2, y2, z2, w2) + t42 * gz2;
+       *    *dnoise_dw += -8.0f * t22 * t2 * w2 * dot(gx2, gy2, gz2, gw2, x2, y2, z2, w2) + t42 * gw2;
+       *    *dnoise_dx += -8.0f * t23 * t3 * x3 * dot(gx3, gy3, gz3, gw3, x3, y3, z3, w3) + t43 * gx3;
+       *    *dnoise_dy += -8.0f * t23 * t3 * y3 * dot(gx3, gy3, gz3, gw3, x3, y3, z3, w3) + t43 * gy3;
+       *    *dnoise_dz += -8.0f * t23 * t3 * z3 * dot(gx3, gy3, gz3, gw3, x3, y3, z3, w3) + t43 * gz3;
+       *    *dnoise_dw += -8.0f * t23 * t3 * w3 * dot(gx3, gy3, gz3, gw3, x3, y3, z3, w3) + t43 * gw3;
+       *    *dnoise_dx += -8.0f * t24 * t4 * x4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gx4;
+       *    *dnoise_dy += -8.0f * t24 * t4 * y4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gy4;
+       *    *dnoise_dz += -8.0f * t24 * t4 * z4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gz4;
+       *    *dnoise_dw += -8.0f * t24 * t4 * w4 * dot(gx4, gy4, gz4, gw4, x4, y4, z4, w4) + t44 * gw4;
+       */
+          float temp0 = t20 * t0 * ( gx0 * x0 + gy0 * y0 + gz0 * z0 + gw0 * w0 );
+          dnoise_dx = temp0 * x0;
+          dnoise_dy = temp0 * y0;
+          dnoise_dz = temp0 * z0;
+          dnoise_dw = temp0 * w0;
+          float temp1 = t21 * t1 * ( gx1 * x1 + gy1 * y1 + gz1 * z1 + gw1 * w1 );
+          dnoise_dx += temp1 * x1;
+          dnoise_dy += temp1 * y1;
+          dnoise_dz += temp1 * z1;
+          dnoise_dw += temp1 * w1;
+          float temp2 = t22 * t2 * ( gx2 * x2 + gy2 * y2 + gz2 * z2 + gw2 * w2 );
+          dnoise_dx += temp2 * x2;
+          dnoise_dy += temp2 * y2;
+          dnoise_dz += temp2 * z2;
+          dnoise_dw += temp2 * w2;
+          float temp3 = t23 * t3 * ( gx3 * x3 + gy3 * y3 + gz3 * z3 + gw3 * w3 );
+          dnoise_dx += temp3 * x3;
+          dnoise_dy += temp3 * y3;
+          dnoise_dz += temp3 * z3;
+          dnoise_dw += temp3 * w3;
+          float temp4 = t24 * t4 * ( gx4 * x4 + gy4 * y4 + gz4 * z4 + gw4 * w4 );
+          dnoise_dx += temp4 * x4;
+          dnoise_dy += temp4 * y4;
+          dnoise_dz += temp4 * z4;
+          dnoise_dw += temp4 * w4;
+          dnoise_dx *= -8.0;
+          dnoise_dy *= -8.0;
+          dnoise_dz *= -8.0;
+          dnoise_dw *= -8.0;
+          dnoise_dx += t40 * gx0 + t41 * gx1 + t42 * gx2 + t43 * gx3 + t44 * gx4;
+          dnoise_dy += t40 * gy0 + t41 * gy1 + t42 * gy2 + t43 * gy3 + t44 * gy4;
+          dnoise_dz += t40 * gz0 + t41 * gz1 + t42 * gz2 + t43 * gz3 + t44 * gz4;
+          dnoise_dw += t40 * gw0 + t41 * gw1 + t42 * gw2 + t43 * gw3 + t44 * gw4;
+  
+          dnoise_dx *= 28.0; 
+          dnoise_dy *= 28.0;
+          dnoise_dz *= 28.0;
+          dnoise_dw *= 28.0;
+      //   }
+  
+      return noise;
+  }
 
-        vec4 r = mod(p, 49.0);
-
-        vec4 x_ = floor(r / 7.0);
-        vec4 y_ = floor(r - 7.0 * x_); 
-
-        vec4 x = (x_ * 2.0 + 0.5) / 7.0 - 1.0;
-        vec4 y = (y_ * 2.0 + 0.5) / 7.0 - 1.0;
-
-        vec4 h = 1.0 - abs(x) - abs(y);
-
-        vec4 b0 = vec4(x.xy, y.xy);
-        vec4 b1 = vec4(x.zw, y.zw);
-
-        vec4 s0 = floor(b0) * 2.0 + 1.0;
-        vec4 s1 = floor(b1) * 2.0 + 1.0;
-        vec4 sh = -step(h, vec4(0.0));
-
-        vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
-        vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
-
-        vec3 g1 = vec3(a0.xy, h.x);
-        vec3 g2 = vec3(a0.zw, h.y);
-        vec3 g3 = vec3(a1.xy, h.z);
-        vec3 g4 = vec3(a1.zw, h.w);
-
-        vec4 n = taylor(vec4(dot(g1,g1),dot(g2,g2),dot(g3,g3),dot(g4,g4)));    
-
-        vec3 n1 = g1 * n.x;
-        vec3 n2 = g2 * n.y;
-        vec3 n3 = g3 * n.z;
-        vec3 n4 = g4 * n.w;
-
-        vec4 m = vec4(dot(p1,p1),dot(p2,p2),dot(p3,p3),dot(p4,p4));
-        
-        vec4 m1 = max(0.6 - m, 0.0);
-        vec4 m2 = m1 * m1;
-        vec4 m3 = m2 * m1;
-        vec4 m4 = m2 * m2;
-        
-        vec3 q1 = -6.0 * m3.x * p1 * dot(p1, n1) + m4.x * n1;
-        vec3 q2 = -6.0 * m3.y * p2 * dot(p2, n2) + m4.y * n2;
-        vec3 q3 = -6.0 * m3.z * p3 * dot(p3, n3) + m4.z * n3;
-        vec3 q4 = -6.0 * m3.w * p4 * dot(p4, n4) + m4.w * n4;
-        
-        vec3 q = q1+q2+q3+q4;
-        
-        vec4 t = vec4(dot(p1,n1),dot(p2,n2),dot(p3,n3),dot(p4,n4));
-        
-        return (64.0 * vec4(q, dot(m4, t))) * 0.5 + 0.5;
-        
-    }
-
-`;
-
-/*
-const noiseSource = `
-
-    const float F3 = 0.3333333;
-    const float G3 = 0.1666667;
-
-    float noise (vec3 v) {    
-
-        vec3 s = floor(v+dot(v,vec3(F3)));
-        vec3 p = v-s+dot(s,vec3(G3));
-        vec3 e = step(vec3(0.0),p-p.yzx);    
-        vec3 i1 = e*(1.0-e.zxy);
-        vec3 i2 = 1.0-e.zxy*(1.0-e);
-        vec3 p1 = p-i1+G3;
-        vec3 p2 = p-i2+2.0*G3;
-        vec3 p3 = p-1.0+3.0*G3;    
-        vec4 w = vec4(dot(p,p),dot(p1,p1),dot(p2,p2),dot(p3,p3));    
-        vec4 d = vec4(dot(random(s),p),dot(random(s+i1),p1),dot(random(s+i2),p2),dot(random(s+1.0),p3));
-        
-        w = max(0.6-w,0.0);
-        
-        w *= w;
-        w *= w;
-        d *= w;
-
-        return 0.5 + dot(d,vec4(52.0)) * 0.5;
-        
-    }
-
-`;
-*/
+  `;
