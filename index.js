@@ -4,11 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const bot = url.searchParams.get("bot");
     const seed = parseFloat(url.searchParams.get("seed")) || Math.random();
 
-    const canvas = document.querySelector("canvas");    
+    console.log(seed);
 
+    const canvas = document.querySelector("canvas");
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
-    
     const gl = canvas.getContext("webgl2", {
         preserveDrawingBuffer: true,
         alpha: false,
@@ -19,11 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
     let time = 0.0;
     let last = (Date.now() / 1000);
 
-    const terrain = new Sphere(333, seed, gl, terrainVertexShaderSource, fragmentShaderSource);
-    const ocean = new Sphere(333, seed*seed, gl, oceanVertexShaderSource, fragmentShaderSource, true);
-    const clouds = new Sphere(333, seed*seed*seed, gl, cloudsVertexShaderSource, fragmentShaderSource, true);
+    const resolution = bot ? 333 : 999;
 
-    terrain.gradient = createRandomGradient(seed);
+    const terrain = new Sphere(resolution, seed, gl, terrainVertexShaderSource, fragmentShaderSource);
+    const ocean = new Sphere(resolution, seed*seed, gl, oceanVertexShaderSource, fragmentShaderSource, true);
+    const clouds = new Sphere(resolution, seed*seed*seed, gl, cloudsVertexShaderSource, fragmentShaderSource, true);
 
     const render = () => {
 
@@ -34,15 +34,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         gl.enable(gl.DEPTH_TEST);
         gl.clearDepth(1.0);
-        gl.depthFunc(gl.LEQUAL);        
+        gl.depthFunc(gl.LEQUAL);
 
-        terrain.angle.y -= 0.005;
+        terrain.angle.y -= 0.0025;
         terrain.render(time);
 
-        ocean.angle.y -= 0.005;
+        ocean.angle.y -= 0.0025;
         ocean.render(time);
 
-        clouds.angle.y -= 0.005;
+        clouds.angle.y -= 0.0025;
         clouds.render(time);
 
         var curr = (Date.now() / 1000);
