@@ -14,7 +14,8 @@ const terrainVertexShaderSource = `
 
         vec4 d = vec4(0.0);
 
-        float v = fbm(vec4(position.xyz, 0.0), d, 8);
+        float v = fbm(vec4(position.xyz, 0.0), d, 8);        
+        
         color = gradient(v);
         v = (v/2.0)+1.5;
         gl_Position = projection * view * vec4(position.xyz * v, position.w); 

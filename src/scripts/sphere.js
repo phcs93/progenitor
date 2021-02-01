@@ -23,6 +23,7 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indexes), gl.STATIC_DRAW);
 
+    const permutationLocation = gl.getUniformLocation(program, 'permutation');
     const seedLocation = gl.getUniformLocation(program, "seed");
     const timeLocation = gl.getUniformLocation(program, "time");
     const breakpointsLocation = gl.getUniformLocation(program, "breakpoints");
@@ -32,6 +33,8 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     const viewLocation = gl.getUniformLocation(program, "view");
     const normalLocation = gl.getUniformLocation(program, "normal");
     const projectionLocation = gl.getUniformLocation(program, "projection");
+
+    const perm = new Uint8Array(createPermutationTable(seed));
 
     this.render = time => {
         
@@ -62,6 +65,16 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
         const projectionMatrix = glMatrix.mat4.create();
         glMatrix.mat4.perspective(projectionMatrix, 45 * Math.PI / 180, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100.0);
         gl.uniformMatrix4fv(projectionLocation, false, projectionMatrix);
+
+        const texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        // gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1); 
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, perm.length, 1, 0, gl.ALPHA, gl.UNSIGNED_BYTE, perm);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.uniform1i(permutationLocation, 0);
 
         gl.uniform1f(seedLocation, seed);
         gl.uniform1f(timeLocation, time);
@@ -106,6 +119,23 @@ function createPositionsAndIndexes (resolution) { // http://www.songho.ca/opengl
     }
 
     return {positions, indexes};
+
+}
+
+function createPermutationTable (seed) {
+
+    var LCG = s => () => (2**31-1&(s=Math.imul(48271,s)))/2**31;
+    var lcg = LCG(seed * Number.MAX_SAFE_INTEGER);
+
+    let array = [];
+
+    for (let i = 0; i < 256; i++) {
+        array.push(i);
+    }
+
+    array = array.sort(() => lcg() > 0.5 ? -1 : 1);
+
+    return array.concat(array);
 
 }
 
