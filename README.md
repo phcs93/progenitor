@@ -5,6 +5,8 @@ Procedural planet generation with WebGL.
 https://phcs93.github.io/genesis/
 
 # TO-DO
+* **generate gradient as a texture**
+  * I have to try to use the built-in `texImage2D` to interpolate the gradient
 * **improve parameter randomization**
 * remove "gl-matrix.js" depedency
 * matcap texture?
