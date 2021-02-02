@@ -6,10 +6,12 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragment);
     const program = createProgram(gl, vertexShader, fragmentShader);
 
-    this.x = 0;
-    this.y = 0;
-    this.z = -6;
+    this.position = {x:0,y:0,z:-6};
     this.angle = {x:0,y:0,z:0};
+
+    this.ambientLightColor = {r: 0.025, g: 0.025, b: 0.025};
+    this.directionalLightColor = {r: 1,  g: 1, b: 1};
+    this.directionalLightVector = {x: 1.0, y: 0.0, z: 1.0};
 
     const gradient = createRandomGradient(seed);
 
@@ -23,16 +25,21 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indexes), gl.STATIC_DRAW);
 
-    const permutationLocation = gl.getUniformLocation(program, 'permutation');
-    const seedLocation = gl.getUniformLocation(program, "seed");
     const timeLocation = gl.getUniformLocation(program, "time");
+    const seedLocation = gl.getUniformLocation(program, "seed");
+
+    const permutationLocation = gl.getUniformLocation(program, 'permutation');
     const breakpointsLocation = gl.getUniformLocation(program, "breakpoints");
     const colorsLocation = gl.getUniformLocation(program, "colors");
 
     const positionLocation = gl.getAttribLocation(program, "position");
     const viewLocation = gl.getUniformLocation(program, "view");
-    const normalLocation = gl.getUniformLocation(program, "normal");
     const projectionLocation = gl.getUniformLocation(program, "projection");
+    const normalLocation = gl.getUniformLocation(program, "normal");
+
+    const ambientLightColorLocation = gl.getUniformLocation(program, "ambientLight");
+    const directionalLightColorLocation = gl.getUniformLocation(program, "directionalLightColor");
+    const directionalLightVectorLocation = gl.getUniformLocation(program, "directionalVector");
 
     const perm = new Uint8Array(createPermutationTable(seed));
 
@@ -47,24 +54,23 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
         gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(positionLocation);
-
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 
         const viewMatrix = glMatrix.mat4.create();
-        glMatrix.mat4.translate(viewMatrix, viewMatrix, [this.x, this.y, this.z]);   
+        glMatrix.mat4.translate(viewMatrix, viewMatrix, [this.position.x, this.position.y, this.position.z]); 
         glMatrix.mat4.rotateX(viewMatrix, viewMatrix, this.angle.x);
         glMatrix.mat4.rotateY(viewMatrix, viewMatrix, this.angle.y);
         glMatrix.mat4.rotateZ(viewMatrix, viewMatrix, this.angle.z);
         gl.uniformMatrix4fv(viewLocation, false, viewMatrix);
 
+        const projectionMatrix = glMatrix.mat4.create();
+        glMatrix.mat4.perspective(projectionMatrix, 45 * Math.PI / 180, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100.0);
+        gl.uniformMatrix4fv(projectionLocation, false, projectionMatrix);
+
         const normalMatrix = glMatrix.mat4.create();
         glMatrix.mat4.invert(normalMatrix, viewMatrix);
         glMatrix.mat4.transpose(normalMatrix, normalMatrix);
         gl.uniformMatrix4fv(normalLocation, false, normalMatrix);
-
-        const projectionMatrix = glMatrix.mat4.create();
-        glMatrix.mat4.perspective(projectionMatrix, 45 * Math.PI / 180, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100.0);
-        gl.uniformMatrix4fv(projectionLocation, false, projectionMatrix);
 
         const texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -78,8 +84,13 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
 
         gl.uniform1f(seedLocation, seed);
         gl.uniform1f(timeLocation, time);
+
         gl.uniform1fv(breakpointsLocation, gradient.map(c => c.value));
         gl.uniform4fv(colorsLocation, gradient.map(c => c.color).reduce((acc, crr) => acc.concat(crr), []));
+
+        gl.uniform3f(ambientLightColorLocation, this.ambientLightColor.r, this.ambientLightColor.g, this.ambientLightColor.b);
+        gl.uniform3f(directionalLightColorLocation, this.directionalLightColor.r, this.directionalLightColor.g, this.directionalLightColor.b);
+        gl.uniform3f(directionalLightVectorLocation, this.directionalLightVector.x, this.directionalLightVector.y, this.directionalLightVector.z);
         
         gl.drawElements(gl.TRIANGLES, indexes.length, gl.UNSIGNED_INT, 0);
 
@@ -196,6 +207,7 @@ function createProgram (gl, vertexShader, fragmentShader) {
 const concatCommonShaders = source => [
     "#version 300 es\r\n",
     "precision highp float;\r\n",
+    uniformsSource,
     noiseSource,
     fbmSource,
     turbulenceSource,
