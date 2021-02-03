@@ -4,8 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const bot = url.searchParams.get("bot");
     const seed = parseFloat(url.searchParams.get("seed")) || Math.random();
 
-    console.log(seed);
-
     const canvas = document.querySelector("canvas");
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;

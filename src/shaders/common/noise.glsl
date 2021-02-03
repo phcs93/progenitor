@@ -203,7 +203,7 @@ const noiseSource = `
 		dnoise_dz *= 28.0;
 		dnoise_dw *= 28.0;
 
-		return 27.0 * (n0 + n1 + n2 + n3 + n4);
+		return 64.0 * (n0 + n1 + n2 + n3 + n4);
 
 	}
 

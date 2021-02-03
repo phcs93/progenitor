@@ -13,7 +13,10 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     this.directionalLightColor = {r: 1,  g: 1, b: 1};
     this.directionalLightVector = {x: 1.0, y: 0.0, z: 1.0};
 
-    const gradient = createRandomGradient(seed);
+    const permutaion = createPermutationTable(seed);
+
+    const breakpoints = createBreakpoints(seed);
+    const gradient = createGradient(breakpoints, resolution);
 
     const alphaCallback = alpha ? () => gl.enable(gl.BLEND) : () => gl.disable(gl.BLEND);
 
@@ -29,8 +32,9 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     const seedLocation = gl.getUniformLocation(program, "seed");
 
     const permutationLocation = gl.getUniformLocation(program, 'permutation');
-    const breakpointsLocation = gl.getUniformLocation(program, "breakpoints");
-    const colorsLocation = gl.getUniformLocation(program, "colors");
+    const gradientLocation = gl.getUniformLocation(program, "gradient");
+    // const breakpointsLocation = gl.getUniformLocation(program, "breakpoints");
+    // const colorsLocation = gl.getUniformLocation(program, "colors");
 
     const positionLocation = gl.getAttribLocation(program, "position");
     const viewLocation = gl.getUniformLocation(program, "view");
@@ -40,8 +44,6 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     const ambientLightColorLocation = gl.getUniformLocation(program, "ambientLight");
     const directionalLightColorLocation = gl.getUniformLocation(program, "directionalLightColor");
     const directionalLightVectorLocation = gl.getUniformLocation(program, "directionalVector");
-
-    const perm = new Uint8Array(createPermutationTable(seed));
 
     this.render = time => {
         
@@ -72,21 +74,37 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
         glMatrix.mat4.transpose(normalMatrix, normalMatrix);
         gl.uniformMatrix4fv(normalLocation, false, normalMatrix);
 
-        const texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        // gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1); 
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, perm.length, 1, 0, gl.ALPHA, gl.UNSIGNED_BYTE, perm);
+        const permuationTexture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, permuationTexture);
+        // gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, permutaion.length, 1, 0, gl.ALPHA, gl.UNSIGNED_BYTE, new Uint8Array(permutaion));       
+
+        const gradientTexture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, gradientTexture);
+        //gl.pixelStorei(gl.UNPACK_ALIGNMENT, 0);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gradient.length / 4, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(gradient));
+
         gl.uniform1i(permutationLocation, 0);
+        gl.uniform1i(gradientLocation, 1);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, permuationTexture);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, gradientTexture);
 
         gl.uniform1f(seedLocation, seed);
         gl.uniform1f(timeLocation, time);
 
-        gl.uniform1fv(breakpointsLocation, gradient.map(c => c.value));
-        gl.uniform4fv(colorsLocation, gradient.map(c => c.color).reduce((acc, crr) => acc.concat(crr), []));
+        // gl.uniform1fv(breakpointsLocation, gradient.map(c => c.value));
+        // gl.uniform4fv(colorsLocation, gradient.map(c => c.color).reduce((acc, crr) => acc.concat(crr), []));
 
         gl.uniform3f(ambientLightColorLocation, this.ambientLightColor.r, this.ambientLightColor.g, this.ambientLightColor.b);
         gl.uniform3f(directionalLightColorLocation, this.directionalLightColor.r, this.directionalLightColor.g, this.directionalLightColor.b);
@@ -150,7 +168,7 @@ function createPermutationTable (seed) {
 
 }
 
-function createRandomGradient (seed) {
+function createBreakpoints (seed) {
 
     var LCG = s => () => (2**31-1&(s=Math.imul(48271,s)))/2**31;
 
@@ -166,6 +184,8 @@ function createRandomGradient (seed) {
         });
     }
 
+    gradient.sort((a,b) => a.value - b.value);
+
     gradient[0].value = 0.0;
     gradient[size-1].value = 1.0;
 
@@ -180,6 +200,41 @@ function createRandomGradient (seed) {
     //     {value: 0.900, color: [0.318, 0.224, 0.157, 1.000]},
     //     {value: 1.000, color: [0.937, 0.937, 0.933, 1.000]}
     // ];
+
+}
+
+function createGradient (breakpoints, resolution) {
+
+    const indexes = (v) => {
+        for (let i = 0; i < breakpoints.length-1; i++) {
+            if (v >= breakpoints[i].value && v < breakpoints[i+1].value) return [i, i+1];
+        }
+        return [breakpoints.length()-2, breakpoints.length()-1];
+    }
+
+    const gradient = [];
+
+    for (let i = 0; i < resolution; i++) {
+
+        const value = i / resolution;
+
+        const [i1, i2] = indexes(value);
+
+        const b1 = breakpoints[i1];
+        const b2 = breakpoints[i2];
+
+        const v = (value - b1.value) / (b2.value - b1.value);
+        //const smoothstep = v*v*(3-2*v);
+        const smoothstep = v*v*v*(v*(v*6-15)+10);
+        const c = glMatrix.vec4.lerp([], b1.color, b2.color, smoothstep);
+
+        const color = glMatrix.vec4.multiply([], c, [255,255,255,255]);
+
+        gradient.push(...color.map(a => parseInt(a)));
+        
+    }
+
+    return gradient;
 
 }
 
@@ -211,6 +266,5 @@ const concatCommonShaders = source => [
     noiseSource,
     fbmSource,
     turbulenceSource,
-    gradientSource,
     source
 ];
