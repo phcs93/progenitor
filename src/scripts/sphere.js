@@ -14,6 +14,8 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     this.directionalLightVector = {x: 1.0, y: 0.0, z: 1.0};
 
     const permutaion = createPermutationTable(seed);
+    const simplex = createSimplexVectors();
+    const tesseract = createTesseractVectors();
 
     const breakpoints = createBreakpoints(seed);
     const gradient = createGradient(breakpoints, resolution);
@@ -31,10 +33,10 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     const timeLocation = gl.getUniformLocation(program, "time");
     const seedLocation = gl.getUniformLocation(program, "seed");
 
-    const permutationLocation = gl.getUniformLocation(program, 'permutation');
+    const permutationLocation = gl.getUniformLocation(program, "permutation");
+    const simplexLocation = gl.getUniformLocation(program, "simplex");
+    const tesseractLocation = gl.getUniformLocation(program, "tesseract");
     const gradientLocation = gl.getUniformLocation(program, "gradient");
-    // const breakpointsLocation = gl.getUniformLocation(program, "breakpoints");
-    // const colorsLocation = gl.getUniformLocation(program, "colors");
 
     const positionLocation = gl.getAttribLocation(program, "position");
     const viewLocation = gl.getUniformLocation(program, "view");
@@ -76,16 +78,30 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
 
         const permuationTexture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, permuationTexture);
-        // gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, permutaion.length, 1, 0, gl.ALPHA, gl.UNSIGNED_BYTE, new Uint8Array(permutaion));       
 
+        const simplexTexture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, simplexTexture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, simplex.length / 4, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(simplex));       
+
+        const terreractTexture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, terreractTexture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, tesseract.length / 4, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(tesseract));       
+        
         const gradientTexture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, gradientTexture);
-        //gl.pixelStorei(gl.UNPACK_ALIGNMENT, 0);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -93,18 +109,21 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gradient.length / 4, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(gradient));
 
         gl.uniform1i(permutationLocation, 0);
-        gl.uniform1i(gradientLocation, 1);
+        gl.uniform1i(simplexLocation, 1);
+        gl.uniform1i(tesseractLocation, 2);
+        gl.uniform1i(gradientLocation, 3);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, permuationTexture);
         gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, simplexTexture);        
+        gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D, terreractTexture);
+        gl.activeTexture(gl.TEXTURE3);
         gl.bindTexture(gl.TEXTURE_2D, gradientTexture);
 
         gl.uniform1f(seedLocation, seed);
         gl.uniform1f(timeLocation, time);
-
-        // gl.uniform1fv(breakpointsLocation, gradient.map(c => c.value));
-        // gl.uniform4fv(colorsLocation, gradient.map(c => c.color).reduce((acc, crr) => acc.concat(crr), []));
 
         gl.uniform3f(ambientLightColorLocation, this.ambientLightColor.r, this.ambientLightColor.g, this.ambientLightColor.b);
         gl.uniform3f(directionalLightColorLocation, this.directionalLightColor.r, this.directionalLightColor.g, this.directionalLightColor.b);
@@ -168,13 +187,39 @@ function createPermutationTable (seed) {
 
 }
 
+function createSimplexVectors () {
+   return [
+        0,1,2,3,0,1,3,2,0,0,0,0,0,2,3,1,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,
+		0,2,1,3,0,0,0,0,0,3,1,2,0,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,1,3,2,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		1,2,0,3,0,0,0,0,1,3,0,2,0,0,0,0,0,0,0,0,0,0,0,0,2,3,0,1,2,3,1,0,
+		1,0,2,3,1,0,3,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,3,1,0,0,0,0,2,1,3,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		2,0,1,3,0,0,0,0,0,0,0,0,0,0,0,0,3,0,1,2,3,0,2,1,0,0,0,0,3,1,2,0,
+		2,1,0,3,0,0,0,0,0,0,0,0,0,0,0,0,3,1,0,2,0,0,0,0,3,2,0,1,3,2,1,0
+    ];
+}
+
+function createTesseractVectors () {
+    return [
+        0.0,1.0,1.0,1.0,0.0,1.0,1.0,-1.0,0.0,1.0,-1.0,1.0,0.0,1.0,-1.0,-1.0,
+        0.0,-1.0,1.0,1.0,0.0,-1.0,1.0,-1.0,0.0,-1.0,-1.0,1.0,0.0,-1.0,-1.0,-1.0,
+        1.0,0.0,1.0,1.0,1.0,0.0,1.0,-1.0,1.0,0.0,-1.0,1.0,1.0,0.0,-1.0,-1.0,
+        -1.0,0.0,1.0,1.0,-1.0,0.0,1.0,-1.0,-1.0,0.0,-1.0,1.0,-1.0,0.0,-1.0,-1.0,
+        1.0,1.0,0.0,1.0,1.0,1.0,0.0,-1.0,1.0,-1.0,0.0,1.0,1.0,-1.0,0.0,-1.0,
+        -1.0,1.0,0.0,1.0,-1.0,1.0,0.0,-1.0,-1.0,-1.0,0.0,1.0,-1.0,-1.0,0.0,-1.0,
+        1.0,1.0,1.0,0.0,1.0,1.0,-1.0,0.0,1.0,-1.0,1.0,0.0,1.0,-1.0,-1.0,0.0,
+        -1.0,1.0,1.0,0.0,-1.0,1.0,-1.0,0.0,-1.0,-1.0,1.0,0.0,-1.0,-1.0,-1.0,0.0	
+    ];
+ }
+
 function createBreakpoints (seed) {
 
-    var LCG = s => () => (2**31-1&(s=Math.imul(48271,s)))/2**31;
+    const LCG = s => () => (2**31-1&(s=Math.imul(48271,s)))/2**31;
 
-    var lcg = LCG(seed * Number.MAX_SAFE_INTEGER);
+    const lcg = LCG(seed * Number.MAX_SAFE_INTEGER);
 
-    var size = ~~(lcg() * 30) + 2;
+    const size = ~~(lcg() * 30) + 2;
     const gradient = [];
 
     for (let i = 0; i < size; i++) {

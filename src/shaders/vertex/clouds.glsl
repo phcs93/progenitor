@@ -12,10 +12,11 @@ const cloudsVertexShaderSource = `
 
         vec4 d = vec4(0.0);
         float v = turbulence(vec4(position.xyz, time/20.0), d, 8);
+        v = v/0.5-0.5;
 
         vec4 c = texture(gradient, vec2(seed, 0.0));
         color = vec4(c.rgb, v > 0.5 ? smoothstep(0.5, 1.0, v) : 0.0);      
-        gl_Position = projection * view * vec4(position.xyz * 2.0, position.w);        
+        gl_Position = projection * view * vec4(position.xyz * 2.0 , position.w);        
 
         vec3 normalized = normalize(position.xyz - (d.xyz * 0.45));
         vec4 transformedNormal = normal * vec4(normalized, 1.0);

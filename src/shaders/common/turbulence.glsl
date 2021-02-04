@@ -27,10 +27,10 @@ const turbulenceSource = `
         float z3 = v.z + (98712.0 / 65536.0);
         float w3 = v.w + (54886.0 / 65536.0);
 
-        float xd = v.x + (noise(x0, y0, z0, w0, dx, dy, dz, dw) * 0.5 + 0.5);
-        float yd = v.y + (noise(x1, y1, z1, w1, dx, dy, dz, dw) * 0.5 + 0.5);
-        float zd = v.z + (noise(x2, y2, z2, w2, dx, dy, dz, dw) * 0.5 + 0.5);
-        float wd = v.w + (noise(x3, y3, z3, w3, dx, dy, dz, dw) * 0.5 + 0.5);
+        float xd = v.x + (noise(x0, y0, z0, w0, dx, dy, dz, dw));
+        float yd = v.y + (noise(x1, y1, z1, w1, dx, dy, dz, dw));
+        float zd = v.z + (noise(x2, y2, z2, w2, dx, dy, dz, dw));
+        float wd = v.w + (noise(x3, y3, z3, w3, dx, dy, dz, dw));
 
         return fbm(vec4(xd, yd, zd, wd), derivatives, octaves);
 

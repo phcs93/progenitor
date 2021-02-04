@@ -11,12 +11,13 @@ const terrainVertexShaderSource = `
     void main() {
 
         vec4 d = vec4(0.0);
-
         float v = fbm(vec4(position.xyz, 0.0), d, 8);
+        v = v/0.5-0.5;
         
-        color = texture(gradient, vec2(v, 0.0));;
+        color = texture(gradient, vec2(v, 0.0));
+
         v = (v/2.0)+1.5;
-        gl_Position = projection * view * vec4(position.xyz * v, position.w); 
+        gl_Position = projection * view * vec4(position.xyz * v, position.w);
 
         vec3 normalized = normalize(position.xyz - (d.xyz * 0.45));
         vec4 transformedNormal = normal * vec4(normalized, 1.0);

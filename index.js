@@ -20,8 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const resolution = bot ? 300 : 500;
 
     const terrain = new Sphere(resolution, seed, gl, terrainVertexShaderSource, fragmentShaderSource);
-    const ocean = new Sphere(resolution, seed*seed, gl, oceanVertexShaderSource, fragmentShaderSource, true);
-    const clouds = new Sphere(resolution, seed*seed*seed, gl, cloudsVertexShaderSource, fragmentShaderSource, true);
+    const ocean = new Sphere(resolution, seed, gl, oceanVertexShaderSource, fragmentShaderSource, true);
+    const clouds = new Sphere(resolution, seed, gl, cloudsVertexShaderSource, fragmentShaderSource, true);
 
     const render = () => {
 

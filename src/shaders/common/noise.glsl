@@ -3,43 +3,34 @@
 const noiseSource = `
 
 	uniform sampler2D permutation;
+	uniform sampler2D simplex;
+	uniform sampler2D tesseract;
 
-	int perm(int i) {
-		return int(texture(permutation, vec2(float(i)/512.0, 1.0)).a * 255.0);
+	int perm (int i) {
+		vec2 p = vec2(float(i)/512.0, 0.0);
+		return int(texture(permutation, p).a * 255.0);
 	}
 
-	vec4[32] grad4lut = vec4[32](
-		vec4( 0.0, 1.0, 1.0, 1.0 ), vec4( 0.0, 1.0, 1.0, -1.0 ), vec4( 0.0, 1.0, -1.0, 1.0 ), vec4( 0.0, 1.0, -1.0, -1.0 ), // 32 tesseract edges
-		vec4( 0.0, -1.0, 1.0, 1.0 ), vec4( 0.0, -1.0, 1.0, -1.0 ), vec4( 0.0, -1.0, -1.0, 1.0 ), vec4( 0.0, -1.0, -1.0, -1.0 ),
-		vec4( 1.0, 0.0, 1.0, 1.0 ), vec4( 1.0, 0.0, 1.0, -1.0 ), vec4( 1.0, 0.0, -1.0, 1.0 ), vec4( 1.0, 0.0, -1.0, -1.0 ),
-		vec4( -1.0, 0.0, 1.0, 1.0 ), vec4( -1.0, 0.0, 1.0, -1.0 ), vec4( -1.0, 0.0, -1.0, 1.0 ), vec4( -1.0, 0.0, -1.0, -1.0 ),
-		vec4( 1.0, 1.0, 0.0, 1.0 ), vec4( 1.0, 1.0, 0.0, -1.0 ), vec4( 1.0, -1.0, 0.0, 1.0 ), vec4( 1.0, -1.0, 0.0, -1.0 ),
-		vec4( -1.0, 1.0, 0.0, 1.0 ), vec4( -1.0, 1.0, 0.0, -1.0 ), vec4( -1.0, -1.0, 0.0, 1.0 ), vec4( -1.0, -1.0, 0.0, -1.0 ),
-		vec4( 1.0, 1.0, 1.0, 0.0 ), vec4( 1.0, 1.0, -1.0, 0.0 ), vec4( 1.0, -1.0, 1.0, 0.0 ), vec4( 1.0, -1.0, -1.0, 0.0 ),
-		vec4( -1.0, 1.0, 1.0, 0.0 ), vec4( -1.0, 1.0, -1.0, 0.0 ), vec4( -1.0, -1.0, 1.0, 0.0 ), vec4( -1.0, -1.0, -1.0, 0.0)
-	);
+	ivec4 simp (int i) {
+		vec2 p = vec2(float(i)/64.0, 0.0);
+		return ivec4(texture(simplex, p) * 255.0);
+	}
 
-	ivec4[64] simplex = ivec4[64](
-		ivec4(0,1,2,3),ivec4(0,1,3,2),ivec4(0,0,0,0),ivec4(0,2,3,1),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(1,2,3,0),
-		ivec4(0,2,1,3),ivec4(0,0,0,0),ivec4(0,3,1,2),ivec4(0,3,2,1),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(1,3,2,0),
-		ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),
-		ivec4(1,2,0,3),ivec4(0,0,0,0),ivec4(1,3,0,2),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(2,3,0,1),ivec4(2,3,1,0),
-		ivec4(1,0,2,3),ivec4(1,0,3,2),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(2,0,3,1),ivec4(0,0,0,0),ivec4(2,1,3,0),
-		ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),
-		ivec4(2,0,1,3),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(3,0,1,2),ivec4(3,0,2,1),ivec4(0,0,0,0),ivec4(3,1,2,0),
-		ivec4(2,1,0,3),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(3,1,0,2),ivec4(0,0,0,0),ivec4(3,2,0,1),ivec4(3,2,1,0)
-	);
+	vec4 tess (int i) {
+		vec2 p = vec2(float(i)/32.0, 0.0);
+		return texture(tesseract, p) / 0.5 -0.5;
+	}
 
-	void grad4 (int hash, out float gx, out float gy, out float gz, out float gw) {
+	void grad (int hash, out float gx, out float gy, out float gz, out float gw) {
 		int h = hash & 31;
-		gx = grad4lut[h][0];
-		gy = grad4lut[h][1];
-		gz = grad4lut[h][2];
-		gw = grad4lut[h][3];
+		gx = tess(h)[0];
+		gy = tess(h)[1];
+		gz = tess(h)[2];
+		gw = tess(h)[3];
 	}
 
-	float F4 = 0.309016994;
-	float G4 = 0.138196601;
+	const float F4 = 0.309016994;
+	const float G4 = 0.138196601;
 
 	float noise (float x, float y, float z, float w, out float dnoise_dx, out float dnoise_dy, out float dnoise_dz, out float dnoise_dw) {
 
@@ -78,18 +69,18 @@ const noiseSource = `
 		int c6 = (z0 > w0) ? 1 : 0;
 		int c = c1 | c2 | c3 | c4 | c5 | c6; 
 
-		int i1 = simplex[c][0] >= 3 ? 1 : 0;
-		int j1 = simplex[c][1] >= 3 ? 1 : 0;
-		int k1 = simplex[c][2] >= 3 ? 1 : 0;
-		int l1 = simplex[c][3] >= 3 ? 1 : 0;
-		int i2 = simplex[c][0] >= 2 ? 1 : 0;
-		int j2 = simplex[c][1] >= 2 ? 1 : 0;
-		int k2 = simplex[c][2] >= 2 ? 1 : 0;
-		int l2 = simplex[c][3] >= 2 ? 1 : 0;
-		int i3 = simplex[c][0] >= 1 ? 1 : 0;
-		int j3 = simplex[c][1] >= 1 ? 1 : 0;
-		int k3 = simplex[c][2] >= 1 ? 1 : 0;
-		int l3 = simplex[c][3] >= 1 ? 1 : 0;
+		int i1 = simp(c)[0] >= 3 ? 1 : 0;
+		int j1 = simp(c)[1] >= 3 ? 1 : 0;
+		int k1 = simp(c)[2] >= 3 ? 1 : 0;
+		int l1 = simp(c)[3] >= 3 ? 1 : 0;
+		int i2 = simp(c)[0] >= 2 ? 1 : 0;
+		int j2 = simp(c)[1] >= 2 ? 1 : 0;
+		int k2 = simp(c)[2] >= 2 ? 1 : 0;
+		int l2 = simp(c)[3] >= 2 ? 1 : 0;
+		int i3 = simp(c)[0] >= 1 ? 1 : 0;
+		int j3 = simp(c)[1] >= 1 ? 1 : 0;
+		int k3 = simp(c)[2] >= 1 ? 1 : 0;
+		int l3 = simp(c)[3] >= 1 ? 1 : 0;
 
 		float x1 = x0 - float(i1) + G4; 
 		float y1 = y0 - float(j1) + G4;
@@ -124,7 +115,7 @@ const noiseSource = `
 		} else {
 			t20 = t0 * t0;
 			t40 = t20 * t20;
-			grad4(perm(ii+perm(jj+perm(kk+perm(ll)))), gx0,gy0,gz0,gw0);
+			grad(perm(ii+perm(jj+perm(kk+perm(ll)))), gx0,gy0,gz0,gw0);
 			n0 = t40 * ( gx0 * x0 + gy0 * y0 + gz0 * z0 + gw0 * w0 );
 		}
 
@@ -133,7 +124,7 @@ const noiseSource = `
 		} else {
 			t21 = t1 * t1;
 			t41 = t21 * t21;
-			grad4(perm(ii+i1+perm(jj+j1+perm(kk+k1+perm(ll+l1)))), gx1,gy1,gz1,gw1);
+			grad(perm(ii+i1+perm(jj+j1+perm(kk+k1+perm(ll+l1)))), gx1,gy1,gz1,gw1);
 			n1 = t41 * ( gx1 * x1 + gy1 * y1 + gz1 * z1 + gw1 * w1 );
 		}
 
@@ -142,7 +133,7 @@ const noiseSource = `
 		} else {
 			t22 = t2 * t2;
 			t42 = t22 * t22;
-			grad4(perm(ii+i2+perm(jj+j2+perm(kk+k2+perm(ll+l2)))), gx2,gy2,gz2,gw2);
+			grad(perm(ii+i2+perm(jj+j2+perm(kk+k2+perm(ll+l2)))), gx2,gy2,gz2,gw2);
 			n2 = t42 * ( gx2 * x2 + gy2 * y2 + gz2 * z2 + gw2 * w2 );
 		}
 
@@ -151,7 +142,7 @@ const noiseSource = `
 		} else {
 			t23 = t3 * t3;
 			t43 = t23 * t23;
-			grad4(perm(ii+i3+perm(jj+j3+perm(kk+k3+perm(ll+l3)))), gx3,gy3,gz3,gw3);
+			grad(perm(ii+i3+perm(jj+j3+perm(kk+k3+perm(ll+l3)))), gx3,gy3,gz3,gw3);
 			n3 = t43 * ( gx3 * x3 + gy3 * y3 + gz3 * z3 + gw3 * w3 );
 		}
 
@@ -160,7 +151,7 @@ const noiseSource = `
 		} else {
 			t24 = t4 * t4;
 			t44 = t24 * t24;
-			grad4(perm(ii+1+perm(jj+1+perm(kk+1+perm(ll+1)))), gx4,gy4,gz4,gw4);
+			grad(perm(ii+1+perm(jj+1+perm(kk+1+perm(ll+1)))), gx4,gy4,gz4,gw4);
 			n4 = t44 * ( gx4 * x4 + gy4 * y4 + gz4 * z4 + gw4 * w4 );
 		}
 
@@ -197,13 +188,20 @@ const noiseSource = `
 		dnoise_dy += t40 * gy0 + t41 * gy1 + t42 * gy2 + t43 * gy3 + t44 * gy4;
 		dnoise_dz += t40 * gz0 + t41 * gz1 + t42 * gz2 + t43 * gz3 + t44 * gz4;
 		dnoise_dw += t40 * gw0 + t41 * gw1 + t42 * gw2 + t43 * gw3 + t44 * gw4;
-
 		dnoise_dx *= 28.0; 
 		dnoise_dy *= 28.0;
 		dnoise_dz *= 28.0;
 		dnoise_dw *= 28.0;
+		dnoise_dx *= 0.5; 
+		dnoise_dy *= 0.5;
+		dnoise_dz *= 0.5;
+		dnoise_dw *= 0.5;
+		dnoise_dx += 0.5; 
+		dnoise_dy += 0.5;
+		dnoise_dz += 0.5;
+		dnoise_dw += 0.5;
 
-		return 64.0 * (n0 + n1 + n2 + n3 + n4);
+		return (27.0 * (n0 + n1 + n2 + n3 + n4)) * 0.5 + 0.5;
 
 	}
 
