@@ -19,6 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const resolution = bot ? 300 : 500;
 
+    const background = new Background(gl, seed, backgroundVertexShaderSource, backgroundFragmentShaderSource);
+
     const terrain = new Sphere(resolution, seed, gl, terrainVertexShaderSource, fragmentShaderSource);
     const ocean = new Sphere(resolution, seed, gl, oceanVertexShaderSource, fragmentShaderSource, true);
     const clouds = new Sphere(resolution, seed, gl, cloudsVertexShaderSource, fragmentShaderSource, true);
@@ -33,6 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
         gl.enable(gl.DEPTH_TEST);
         gl.clearDepth(1.0);
         gl.depthFunc(gl.LEQUAL);
+
+        background.position.z = -100.0;
+        background.render(time);
 
         terrain.angle.y -= 0.0025;
         terrain.render(time);

@@ -2,6 +2,10 @@
 
     <head>
 
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <!-- lib -->
         <script type="application/javascript" src="lib/gl-matrix.js"></script>
 
@@ -12,14 +16,17 @@
         <script src="src/shaders/common/turbulence.glsl"></script>
 
         <!-- vertex shaders -->
+        <script src="src/shaders/vertex/background.glsl"></script>
         <script src="src/shaders/vertex/clouds.glsl"></script>
         <script src="src/shaders/vertex/ocean.glsl"></script>
         <script src="src/shaders/vertex/terrain.glsl"></script>
 
         <!-- fragment shader -->
+        <script src="src/shaders/fragment/background.glsl"></script>
         <script src="src/shaders/fragment/fragment.glsl"></script>
 
         <!-- scripts -->
+        <script type="application/javascript" src="src/scripts/background.js"></script>
         <script type="application/javascript" src="src/scripts/sphere.js"></script>
 
         <!-- index -->
