@@ -18,6 +18,7 @@ https://phcs93.github.io/genesis/
 * add UI controls (mobile first?)
 * add mouse control do rotate the planet
 * add background (particles)
+  * skybox with fragment shader particles
 * add more noise algorithms
   * fbm wave modifiers
   * generators
