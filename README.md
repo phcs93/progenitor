@@ -10,6 +10,7 @@ https://phcs93.github.io/genesis/
 * headless mode renders no light when using derivative normals
 
 # TO-DO
+* refactor noise.glsl to use vectors
 * improve parameter randomization
 * remove "gl-matrix.js" depedency
 * matcap texture?
