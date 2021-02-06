@@ -28,7 +28,9 @@ https://phcs93.github.io/genesis/
 
 ## EXTRA
 * generate procedural audio
-* upload custom heightmap
+* upload custom parameters
+  * heightmap
+  * gradient
 
 ## OUT OF SCOPE (for now)
 * render a solar system
