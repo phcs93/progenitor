@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const resolution = bot ? 300 : 500;
 
-    const background = new Background(gl, seed, backgroundVertexShaderSource, backgroundFragmentShaderSource);
+    const background = new Cube(gl, seed, backgroundVertexShaderSource, backgroundFragmentShaderSource);
 
     const terrain = new Sphere(resolution, seed, gl, terrainVertexShaderSource, fragmentShaderSource);
     const ocean = new Sphere(resolution, seed, gl, oceanVertexShaderSource, fragmentShaderSource, true);
@@ -36,17 +36,16 @@ document.addEventListener("DOMContentLoaded", () => {
         gl.clearDepth(1.0);
         gl.depthFunc(gl.LEQUAL);
 
-        background.position.z = -100.0;
         background.render(time);
 
         terrain.angle.y -= 0.0025;
         terrain.render(time);
 
-        ocean.angle.y -= 0.0025;
-        ocean.render(time);
+        // ocean.angle.y -= 0.0025;
+        // ocean.render(time);
 
-        clouds.angle.y -= 0.0025;
-        clouds.render(time);
+        // clouds.angle.y -= 0.0025;
+        // clouds.render(time);
 
         var curr = (Date.now() / 1000);
         time += curr - last;

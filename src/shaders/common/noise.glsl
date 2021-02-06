@@ -6,20 +6,56 @@ const noiseSource = `
 	uniform sampler2D simplex;
 	uniform sampler2D tesseract;
 
+
+// vec4[32] grad4lut = vec4[32](
+//     vec4( 0.0, 1.0, 1.0, 1.0 ), vec4( 0.0, 1.0, 1.0, -1.0 ), vec4( 0.0, 1.0, -1.0, 1.0 ), vec4( 0.0, 1.0, -1.0, -1.0 ), // 32 tesseract edges
+//     vec4( 0.0, -1.0, 1.0, 1.0 ), vec4( 0.0, -1.0, 1.0, -1.0 ), vec4( 0.0, -1.0, -1.0, 1.0 ), vec4( 0.0, -1.0, -1.0, -1.0 ),
+//     vec4( 1.0, 0.0, 1.0, 1.0 ), vec4( 1.0, 0.0, 1.0, -1.0 ), vec4( 1.0, 0.0, -1.0, 1.0 ), vec4( 1.0, 0.0, -1.0, -1.0 ),
+//     vec4( -1.0, 0.0, 1.0, 1.0 ), vec4( -1.0, 0.0, 1.0, -1.0 ), vec4( -1.0, 0.0, -1.0, 1.0 ), vec4( -1.0, 0.0, -1.0, -1.0 ),
+//     vec4( 1.0, 1.0, 0.0, 1.0 ), vec4( 1.0, 1.0, 0.0, -1.0 ), vec4( 1.0, -1.0, 0.0, 1.0 ), vec4( 1.0, -1.0, 0.0, -1.0 ),
+//     vec4( -1.0, 1.0, 0.0, 1.0 ), vec4( -1.0, 1.0, 0.0, -1.0 ), vec4( -1.0, -1.0, 0.0, 1.0 ), vec4( -1.0, -1.0, 0.0, -1.0 ),
+//     vec4( 1.0, 1.0, 1.0, 0.0 ), vec4( 1.0, 1.0, -1.0, 0.0 ), vec4( 1.0, -1.0, 1.0, 0.0 ), vec4( 1.0, -1.0, -1.0, 0.0 ),
+//     vec4( -1.0, 1.0, 1.0, 0.0 ), vec4( -1.0, 1.0, -1.0, 0.0 ), vec4( -1.0, -1.0, 1.0, 0.0 ), vec4( -1.0, -1.0, -1.0, 0.0)
+// );
+
+// ivec4[64] simplex = ivec4[64](
+//     ivec4(0,1,2,3),ivec4(0,1,3,2),ivec4(0,0,0,0),ivec4(0,2,3,1),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(1,2,3,0),
+//     ivec4(0,2,1,3),ivec4(0,0,0,0),ivec4(0,3,1,2),ivec4(0,3,2,1),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(1,3,2,0),
+//     ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),
+//     ivec4(1,2,0,3),ivec4(0,0,0,0),ivec4(1,3,0,2),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(2,3,0,1),ivec4(2,3,1,0),
+//     ivec4(1,0,2,3),ivec4(1,0,3,2),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(2,0,3,1),ivec4(0,0,0,0),ivec4(2,1,3,0),
+//     ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),
+//     ivec4(2,0,1,3),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(3,0,1,2),ivec4(3,0,2,1),ivec4(0,0,0,0),ivec4(3,1,2,0),
+//     ivec4(2,1,0,3),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(0,0,0,0),ivec4(3,1,0,2),ivec4(0,0,0,0),ivec4(3,2,0,1),ivec4(3,2,1,0)
+// );
+
 	int perm (int i) {
 		vec2 p = vec2(float(i)/512.0, 0.0);
 		return int(texture(permutation, p).a * 255.0);
 	}
 
+	// ivec4 simp (int i) {
+	// 	vec2 p = vec2(float(i)/64.0, 0.0);
+	// 	return ivec4(texture(simplex, p) * 255.0 );
+	// }
+
 	ivec4 simp (int i) {
 		vec2 p = vec2(float(i)/64.0, 0.0);
-		return ivec4(texture(simplex, p) * 255.0);
+		return ivec4(floor(texture(simplex, p) * 255.0));
 	}
 
 	vec4 tess (int i) {
 		vec2 p = vec2(float(i)/32.0, 0.0);
-		return texture(tesseract, p) / 0.5 -0.5;
+		return texture(tesseract, p) / 0.5 - 0.5;
 	}
+
+	// ivec4 simp (int i) {
+	// 	return simplex[i];
+	// }
+
+	// vec4 tess (int i) {
+	// 	return grad4lut[i];
+	// }
 
 	void grad (int hash, out float gx, out float gy, out float gz, out float gw) {
 		int h = hash & 31;
@@ -69,18 +105,18 @@ const noiseSource = `
 		int c6 = (z0 > w0) ? 1 : 0;
 		int c = c1 | c2 | c3 | c4 | c5 | c6; 
 
-		int i1 = simp(c)[0] >= 3 ? 1 : 0;
-		int j1 = simp(c)[1] >= 3 ? 1 : 0;
-		int k1 = simp(c)[2] >= 3 ? 1 : 0;
-		int l1 = simp(c)[3] >= 3 ? 1 : 0;
-		int i2 = simp(c)[0] >= 2 ? 1 : 0;
-		int j2 = simp(c)[1] >= 2 ? 1 : 0;
-		int k2 = simp(c)[2] >= 2 ? 1 : 0;
-		int l2 = simp(c)[3] >= 2 ? 1 : 0;
-		int i3 = simp(c)[0] >= 1 ? 1 : 0;
-		int j3 = simp(c)[1] >= 1 ? 1 : 0;
-		int k3 = simp(c)[2] >= 1 ? 1 : 0;
-		int l3 = simp(c)[3] >= 1 ? 1 : 0;
+		int i1 = simp(c)[0] >= 30 ? 1 : 0;
+		int j1 = simp(c)[1] >= 30 ? 1 : 0;
+		int k1 = simp(c)[2] >= 30 ? 1 : 0;
+		int l1 = simp(c)[3] >= 30 ? 1 : 0;
+		int i2 = simp(c)[0] >= 20 ? 1 : 0;
+		int j2 = simp(c)[1] >= 20 ? 1 : 0;
+		int k2 = simp(c)[2] >= 20 ? 1 : 0;
+		int l2 = simp(c)[3] >= 20 ? 1 : 0;
+		int i3 = simp(c)[0] >= 10 ? 1 : 0;
+		int j3 = simp(c)[1] >= 10 ? 1 : 0;
+		int k3 = simp(c)[2] >= 10 ? 1 : 0;
+		int l3 = simp(c)[3] >= 10 ? 1 : 0;
 
 		float x1 = x0 - float(i1) + G4; 
 		float y1 = y0 - float(j1) + G4;
@@ -200,6 +236,11 @@ const noiseSource = `
 		dnoise_dy += 0.5;
 		dnoise_dz += 0.5;
 		dnoise_dw += 0.5;
+
+		dnoise_dx = clamp(dnoise_dx, 0.0, 1.0); 
+		dnoise_dy = clamp(dnoise_dy, 0.0, 1.0);
+		dnoise_dz = clamp(dnoise_dz, 0.0, 1.0);
+		dnoise_dw = clamp(dnoise_dw, 0.0, 1.0);
 
 		return (27.0 * (n0 + n1 + n2 + n3 + n4)) * 0.5 + 0.5;
 
