@@ -4,8 +4,13 @@ Procedural planet generation with WebGL.
 # DEMO
 https://phcs93.github.io/genesis/
 
+# BUGS
+* derivative normals are not correct
+  * i think it's a problem with the direction of the noise
+* headless mode renders no light when using derivative normals
+
 # TO-DO
-* **improve parameter randomization**
+* improve parameter randomization
 * remove "gl-matrix.js" depedency
 * matcap texture?
 * render rivers (how?)
