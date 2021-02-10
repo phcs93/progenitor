@@ -11,14 +11,13 @@ const oceanVertexShaderSource = `
     void main() {
 
         vec4 d = vec4(0.0);
-        //float v = fbm(vec4(position.xyz*50.0, time), d, 8);
-        float v = turbulence(vec4(position.xyz*50.0, time), d, 8);
-        v = v/0.5-0.5;
+        float v = turbulence(vec4(position.xyz*50.0, time), d, 6);
+        v = v / 0.5 - 0.5;
 
         // color = vec4(0.278, 0.49, 0.99, 0.5);
         // gl_Position = projection * view * vec4(position.xyz * (1.75), position.w);
         vec4 c = texture(gradient, vec2(seed, 0.0));
-        color = vec4(c.rgb, 0.25 + (v/2.0));
+        color = vec4(c.rgb, 0.50 + (v/2.0));
         gl_Position = projection * view * vec4(position.xyz * (1.6 + seed/4.0), position.w);
 
         vec3 normalized = normalize(position.xyz - (d.xyz * 0.45));

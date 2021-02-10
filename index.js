@@ -41,11 +41,11 @@ document.addEventListener("DOMContentLoaded", () => {
         terrain.angle.y -= 0.0025;
         terrain.render(time);
 
-        // ocean.angle.y -= 0.0025;
-        // ocean.render(time);
+        ocean.angle.y -= 0.0025;
+        ocean.render(time);
 
-        // clouds.angle.y -= 0.0025;
-        // clouds.render(time);
+        clouds.angle.y -= 0.0025;
+        clouds.render(time);
 
         var curr = (Date.now() / 1000);
         time += curr - last;

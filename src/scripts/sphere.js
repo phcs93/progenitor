@@ -232,7 +232,7 @@ function createBreakpoints (seed) {
 
     const lcg = LCG(seed * Number.MAX_SAFE_INTEGER);
 
-    const size = ~~(lcg() * 8) + 2;
+    const size = ~~(lcg() * 30) + 2;
     const gradient = [];
 
     for (let i = 0; i < size; i++) {
