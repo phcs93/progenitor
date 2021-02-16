@@ -7,6 +7,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.querySelector("canvas");
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
+
+    const mouse = [0.0,0.0];
+
+    window.addEventListener("mousemove", e => {
+        const mouseX = (e.offsetX / canvas.clientWidth)*2-1;
+        const mouseY = ((canvas.clientHeight - e.offsetY) / canvas.clientHeight)*2-1;
+        mouse[0] = mouseX;
+        mouse[1] = mouseY;
+    });
+
     const gl = canvas.getContext("webgl2", {
         preserveDrawingBuffer: true,
         alpha: false,
@@ -39,13 +49,13 @@ document.addEventListener("DOMContentLoaded", () => {
         background.render(time);
 
         terrain.angle.y -= 0.0025;
-        terrain.render(time);
+        terrain.render(time, mouse);
 
         ocean.angle.y -= 0.0025;
-        ocean.render(time);
+        ocean.render(time, mouse);
 
         clouds.angle.y -= 0.0025;
-        clouds.render(time);
+        clouds.render(time, mouse);
 
         var curr = (Date.now() / 1000);
         time += curr - last;

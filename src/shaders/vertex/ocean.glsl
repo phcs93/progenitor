@@ -20,10 +20,11 @@ const oceanVertexShaderSource = `
         color = vec4(c.rgb, 0.50 + (v/2.0));
         gl_Position = projection * view * vec4(position.xyz * (1.6 + seed/4.0), position.w);
 
-        vec3 normalized = normalize(position.xyz - (d.xyz * 0.45));
+        d -= 0.5;
+        vec3 normalized = normalize(position.xyz - d.xyz);
         vec4 transformedNormal = normal * vec4(normalized, 1.0);
-        float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
-        lighting = ambientLight + (directionalLightColor * directional);
+        float directional = max(dot(transformedNormal.xyz, directionalLightDirection), 0.0);
+        lighting = ambientLightColor + (directionalLightColor * directional);
 
     }
 

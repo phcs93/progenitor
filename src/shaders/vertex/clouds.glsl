@@ -18,10 +18,11 @@ const cloudsVertexShaderSource = `
         color = vec4(c.rgb, v > 0.5 ? smoothstep(0.5, 1.0, v) : 0.0);      
         gl_Position = projection * view * vec4(position.xyz * 2.0 , position.w);        
 
-        vec3 normalized = normalize(position.xyz - (d.xyz * 0.45));
+        d -= 0.5;
+        vec3 normalized = normalize(position.xyz - d.xyz);
         vec4 transformedNormal = normal * vec4(normalized, 1.0);
-        float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
-        lighting = ambientLight + (directionalLightColor * directional);
+        float directional = max(dot(transformedNormal.xyz, directionalLightDirection), 0.0);
+        lighting = ambientLightColor + (directionalLightColor * directional);
 
     }
 

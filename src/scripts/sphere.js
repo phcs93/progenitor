@@ -10,8 +10,8 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     this.angle = {x:0,y:0,z:0};
 
     this.ambientLightColor = {r: 0.025, g: 0.025, b: 0.025};
-    this.directionalLightColor = {r: 1,  g: 1, b: 1};
-    this.directionalLightVector = {x: 1.0, y: 0.0, z: 1.0};
+    this.directionalLightColor = {r: 1.0,  g: 1.0, b: 1.0};
+    this.directionalLightDirection = {x: 1.0, y: 0.0, z: 1.0};
 
     const permutaion = createPermutationTable(seed);
     const simplex = createSimplexVectors();
@@ -33,6 +33,8 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     const timeLocation = gl.getUniformLocation(program, "time");
     const seedLocation = gl.getUniformLocation(program, "seed");
 
+    const mouseLocation = gl.getUniformLocation(program, "mouse");
+
     const permutationLocation = gl.getUniformLocation(program, "permutation");
     const simplexLocation = gl.getUniformLocation(program, "simplex");
     const tesseractLocation = gl.getUniformLocation(program, "tesseract");
@@ -43,11 +45,11 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     const projectionLocation = gl.getUniformLocation(program, "projection");
     const normalLocation = gl.getUniformLocation(program, "normal");
 
-    const ambientLightColorLocation = gl.getUniformLocation(program, "ambientLight");
+    const ambientLightColorLocation = gl.getUniformLocation(program, "ambientLightColor");
     const directionalLightColorLocation = gl.getUniformLocation(program, "directionalLightColor");
-    const directionalLightVectorLocation = gl.getUniformLocation(program, "directionalVector");
+    const directionalLightDirectionLocation = gl.getUniformLocation(program, "directionalLightDirection");
 
-    this.render = time => {
+    this.render = (time, mouse) => {
         
         alphaCallback();
         gl.blendEquation(gl.FUNC_ADD);
@@ -125,9 +127,11 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
         gl.uniform1f(seedLocation, seed);
         gl.uniform1f(timeLocation, time);
 
+        gl.uniform2f(mouseLocation, mouse[0], mouse[1]);
+
         gl.uniform3f(ambientLightColorLocation, this.ambientLightColor.r, this.ambientLightColor.g, this.ambientLightColor.b);
         gl.uniform3f(directionalLightColorLocation, this.directionalLightColor.r, this.directionalLightColor.g, this.directionalLightColor.b);
-        gl.uniform3f(directionalLightVectorLocation, this.directionalLightVector.x, this.directionalLightVector.y, this.directionalLightVector.z);
+        gl.uniform3f(directionalLightDirectionLocation, this.directionalLightDirection.x, this.directionalLightDirection.y, this.directionalLightDirection.z);
         
         gl.drawElements(gl.TRIANGLES, indexes.length, gl.UNSIGNED_INT, 0);
 
