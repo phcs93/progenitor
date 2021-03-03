@@ -25,6 +25,7 @@ https://phcs93.github.io/genesis/
   * generators
   * selectors
   * modifiers
+  * fortune's algorithm
 * import/export current seed, parameters and modules
 * animated 2D visualizer
 * post processing
