@@ -22,9 +22,7 @@ const fbmSource = `
 
         derivative /= factor;
 
-        derivative = clamp(derivative, -1.0, 1.0);
-
-        return clamp(signal / factor, -1.0, 1.0);
+        return signal / factor;
 
     }
 

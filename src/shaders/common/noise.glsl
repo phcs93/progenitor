@@ -242,9 +242,7 @@ const noiseSource = `
 		dnoise_dz = clamp(dnoise_dz, 0.0, 1.0);
 		dnoise_dw = clamp(dnoise_dw, 0.0, 1.0);
 
-		float n = (27.0 * (n0 + n1 + n2 + n3 + n4)) * 0.5 + 0.5;
-
-		return clamp(n, 0.0, 1.0);
+		return (27.0 * (n0 + n1 + n2 + n3 + n4)) * 0.5 + 0.5;
 
 	}
 

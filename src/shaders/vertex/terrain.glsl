@@ -37,8 +37,8 @@ const terrainVertexShaderSource = `
     void main() {
 
         vec4 d = vec4(0.0);
-        //float v = fbm(vec4(position.xyz, 0.0), d, 6);
-        float v = turbulence(vec4(position.xyz, 0.0), d, 1, 6);
+        float v = fbm(vec4(position.xyz, 0.0), d, 6);
+        //float v = turbulence(vec4(position.xyz, 0.0), d, 1, 6);
 
         color = texture(gradient, vec2(v, 0.0));
 
