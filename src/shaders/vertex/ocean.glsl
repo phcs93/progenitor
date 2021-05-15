@@ -11,7 +11,7 @@ const oceanVertexShaderSource = `
     void main() {
 
         vec4 d = vec4(0.0);
-        float v = turbulence(vec4(position.xyz*50.0, time), d, 6);
+        float v = turbulence(vec4(position.xyz*50.0, time/2.0), d, 6, 1);
         v = v / 0.5 - 0.5;
 
         // color = vec4(0.278, 0.49, 0.99, 0.5);

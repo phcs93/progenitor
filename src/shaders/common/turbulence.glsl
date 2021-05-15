@@ -1,11 +1,11 @@
 const turbulenceSource = `
 
-    float turbulence (vec4 v, out vec4 derivatives, int octaves) {
+    float turbulence (vec4 v, out vec4 derivatives, int octaves, int distortion) {
 
-        float dx = 0.0;
-        float dy = 0.0;
-        float dz = 0.0;
-        float dw = 0.0;
+        vec4 dx = vec4(0.0);
+        vec4 dy = vec4(0.0);
+        vec4 dz = vec4(0.0);
+        vec4 dw = vec4(0.0);
 
         float x0 = v.x + (12414.0 / 65536.0);
         float y0 = v.y + (65124.0 / 65536.0);
@@ -27,10 +27,10 @@ const turbulenceSource = `
         float z3 = v.z + (98712.0 / 65536.0);
         float w3 = v.w + (54886.0 / 65536.0);
 
-        float xd = v.x + (noise(x0, y0, z0, w0, dx, dy, dz, dw));
-        float yd = v.y + (noise(x1, y1, z1, w1, dx, dy, dz, dw));
-        float zd = v.z + (noise(x2, y2, z2, w2, dx, dy, dz, dw));
-        float wd = v.w + (noise(x3, y3, z3, w3, dx, dy, dz, dw));
+        float xd = v.x + (fbm(vec4(x0, y0, z0, w0), dx, distortion));
+        float yd = v.y + (fbm(vec4(x1, y1, z1, w1), dy, distortion));
+        float zd = v.z + (fbm(vec4(x2, y2, z2, w2), dz, distortion));
+        float wd = v.w + (fbm(vec4(x3, y3, z3, w3), dw, distortion));
 
         return fbm(vec4(xd, yd, zd, wd), derivatives, octaves);
 

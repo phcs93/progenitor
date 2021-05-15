@@ -49,7 +49,7 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     const directionalLightColorLocation = gl.getUniformLocation(program, "directionalLightColor");
     const directionalLightDirectionLocation = gl.getUniformLocation(program, "directionalLightDirection");
 
-    this.render = (time, mouse) => {
+    this.render = (time, mouse, mode = gl.TRIANGLES) => {
         
         alphaCallback();
         gl.blendEquation(gl.FUNC_ADD);
@@ -133,7 +133,7 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
         gl.uniform3f(directionalLightColorLocation, this.directionalLightColor.r, this.directionalLightColor.g, this.directionalLightColor.b);
         gl.uniform3f(directionalLightDirectionLocation, this.directionalLightDirection.x, this.directionalLightDirection.y, this.directionalLightDirection.z);
         
-        gl.drawElements(gl.TRIANGLES, indexes.length, gl.UNSIGNED_INT, 0);
+        gl.drawElements(mode, indexes.length, gl.UNSIGNED_INT, 0);
 
     };
 

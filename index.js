@@ -29,6 +29,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const resolution = bot ? 300 : 500;
 
+    const lightining = {
+        ambientLightColor: {r: 0.025, g: 0.025, b: 0.025},
+        directionalLightColor: {r: 1.0,  g: 1.0, b: 1.0},
+        directionalLightDirection: {x: 1.0, y: 0.0, z: 1.0}
+    };
+
     const background = new Cube(gl, seed, backgroundVertexShaderSource, backgroundFragmentShaderSource);
 
     const terrain = new Sphere(resolution, seed, gl, terrainVertexShaderSource, fragmentShaderSource);
