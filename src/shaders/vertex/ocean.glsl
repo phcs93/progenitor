@@ -18,7 +18,7 @@ const oceanVertexShaderSource = `
         // gl_Position = projection * view * vec4(position.xyz * (1.75), position.w);
         vec4 c = texture(gradient, vec2(seed, 0.0));
         color = vec4(c.rgb, 0.50 + (v/2.0));
-        gl_Position = projection * view * vec4(position.xyz * (1.6 + seed/4.0), position.w);
+        gl_Position = projection * view * vec4(position.xyz * (1.6 + seed/4.0), position.w) ;
 
         d -= 0.5;
         vec3 normalized = normalize(position.xyz - d.xyz);

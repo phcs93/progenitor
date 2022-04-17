@@ -8,13 +8,29 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 
-    const mouse = [0.0,0.0];
+    const mouse = [0.0, 0.0];
+    let pressed = false;
+
+    let movementX = 0;
+    let movementY = 0;
 
     window.addEventListener("mousemove", e => {
-        const mouseX = (e.offsetX / canvas.clientWidth)*2-1;
-        const mouseY = ((canvas.clientHeight - e.offsetY) / canvas.clientHeight)*2-1;
+        const mouseX = (e.offsetX / canvas.clientWidth) * 2 - 1;
+        const mouseY = ((canvas.clientHeight - e.offsetY) / canvas.clientHeight) * 2 - 1;
         mouse[0] = mouseX;
         mouse[1] = mouseY;
+        if (pressed) {
+            movementY += e.movementX/512;
+            movementX += e.movementY/512;
+        }
+    });
+
+    window.addEventListener("mousedown", e => {
+        pressed = true;
+    });
+
+    window.addEventListener("mouseup", e => {
+        pressed = false;
     });
 
     const gl = canvas.getContext("webgl2", {
@@ -30,9 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const resolution = bot ? 300 : 500;
 
     const lightining = {
-        ambientLightColor: {r: 0.025, g: 0.025, b: 0.025},
-        directionalLightColor: {r: 1.0,  g: 1.0, b: 1.0},
-        directionalLightDirection: {x: 1.0, y: 0.0, z: 1.0}
+        ambientLightColor: { r: 0.025, g: 0.025, b: 0.025 },
+        directionalLightColor: { r: 1.0, g: 1.0, b: 1.0 },
+        directionalLightDirection: { x: 1.0, y: 0.0, z: 1.0 }
     };
 
     const background = new Cube(gl, seed, backgroundVertexShaderSource, backgroundFragmentShaderSource);
@@ -54,14 +70,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
         background.render(time);
 
-        terrain.angle.y -= 0.0025;
+        const mX = movementX;
+        const mY = movementY;        
+        
+        if (!pressed) {
+            terrain.angle.y -= (0.0025);
+        } else {
+            terrain.angle.x += mX;            
+            terrain.angle.y += mY; 
+        }
         terrain.render(time, mouse);
 
-        ocean.angle.y -= 0.0025;
+        if (!pressed) {
+            ocean.angle.y -= (0.0025);
+        } else {
+            ocean.angle.x += mX;            
+            ocean.angle.y += mY;
+        }
         ocean.render(time, mouse);
 
-        clouds.angle.y -= 0.0025;
+        if (!pressed) {
+            clouds.angle.y -= (0.0025);
+        } else {
+            clouds.angle.x += mX;            
+            clouds.angle.y += mY;
+        }
         clouds.render(time, mouse);
+
+        movementX -= mX;
+        movementY -= mY;
 
         var curr = (Date.now() / 1000);
         time += curr - last;
@@ -69,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     };
 
-    const loop = () => {        
+    const loop = () => {
         window.requestAnimationFrame(render);
         window.requestAnimationFrame(loop);
     };
@@ -79,5 +116,22 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         window.requestAnimationFrame(loop);
     }
+
+    const reanderGradientHTML = breakpoints => {
+
+        const element = document.getElementById("gradient");
+
+        console.log(breakpoints);
+
+        element.style.background = `linear-gradient(to right,
+            ${breakpoints.map(c => `
+                rgb(${255 * c.color[0]}, ${255 * c.color[1]}, ${255 * c.color[2]}) 
+                ${c.value * 100}%
+            `).join(",")}
+        )`;
+
+    };
+
+    reanderGradientHTML(terrain.breakpoints);
 
 });

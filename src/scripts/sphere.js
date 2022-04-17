@@ -18,6 +18,7 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     const tesseract = createTesseractVectors();
 
     const breakpoints = createBreakpoints(seed);
+    this.breakpoints = breakpoints; // oh no
     const gradient = createGradient(breakpoints, resolution);
 
     const alphaCallback = alpha ? () => gl.enable(gl.BLEND) : () => gl.disable(gl.BLEND);
