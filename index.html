@@ -37,8 +37,24 @@
 
     </head>
 
-    <body>
+    <body>        
         <canvas></canvas>
+        <div id="controlls">
+            <select id="render-mode">
+                <option value="POINTS">POINTS</option>
+                <option value="LINE_STRIP">LINE_STRIP</option>
+                <option value="LINE_LOOP">LINE_LOOP</option>
+                <option value="LINES">LINES</option>
+                <option value="LINE_STRIP_ADJACENCY">LINE_STRIP_ADJACENCY</option>
+                <option value="LINES_ADJACENCY">LINES_ADJACENCY</option>
+                <option value="TRIANGLE_STRIP">TRIANGLE_STRIP</option>
+                <option value="TRIANGLE_FAN">TRIANGLE_FAN</option>
+                <option value="TRIANGLES" selected>TRIANGLES</option>
+                <option value="TRIANGLE_STRIP_ADJACENCY">TRIANGLE_STRIP_ADJACENCY</option>
+                <option value="TRIANGLES_ADJACENCY">TRIANGLES_ADJACENCY</option>
+                <option value="PATCHES">PATCHES</option>
+            </select>
+        </div>
         <div id="gradient"></div>
     </body>
 

@@ -17,6 +17,16 @@ canvas:active {
     cursor: grabbing;
 }
 
+div#controlls {
+    /* background-color: var(--background); */
+    width: 256px;
+    height: 256px;
+    display: block;
+    position: fixed;
+    top: 0;
+    margin: 32px;
+}
+
 div#gradient {
     /* background-color: var(--background); */
     width: 100%;

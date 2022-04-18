@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.addEventListener("mouseup", e => {
         pressed = false;
-    });
+    });    
 
     const gl = canvas.getContext("webgl2", {
         preserveDrawingBuffer: true,
@@ -39,6 +39,25 @@ document.addEventListener("DOMContentLoaded", () => {
         antialias: true,
         premultipliedAlpha: true
     });
+
+    let renderMode = gl.TRIANGLES;
+
+    document.getElementById("render-mode").onchange = function() {
+        switch (this.value) {
+            case "POINTS": renderMode = gl.POINTS; break;
+            case "LINE_STRIP": renderMode = gl.LINE_STRIP; break;
+            case "LINE_LOOP": renderMode = gl.LINE_LOOP; break;
+            case "LINES": renderMode = gl.LINES; break;
+            case "LINE_STRIP_ADJACENCY": renderMode = gl.LINE_STRIP_ADJACENCY; break;
+            case "LINES_ADJACENCY": renderMode = gl.LINES_ADJACENCY; break;
+            case "TRIANGLE_STRIP": renderMode = gl.TRIANGLE_STRIP; break;
+            case "TRIANGLE_FAN": renderMode = gl.TRIANGLE_FAN; break;
+            case "TRIANGLES": renderMode = gl.TRIANGLES; break;
+            case "TRIANGLE_STRIP_ADJACENCY": renderMode = gl.TRIANGLE_STRIP_ADJACENCY; break;
+            case "TRIANGLES_ADJACENCY": renderMode = gl.TRIANGLES_ADJACENCY; break;
+            case "PATCHES": renderMode = gl.PATCHES; break;
+        }
+    };
 
     let time = 0.0;
     let last = (Date.now() / 1000);
@@ -57,6 +76,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const ocean = new Sphere(resolution, seed, gl, oceanVertexShaderSource, fragmentShaderSource, true);
     const clouds = new Sphere(resolution, seed, gl, cloudsVertexShaderSource, fragmentShaderSource, true);
 
+    /*
+        GL_POINTS, 
+        GL_LINE_STRIP, 
+        GL_LINE_LOOP, 
+        GL_LINES, 
+        GL_LINE_STRIP_ADJACENCY, 
+        GL_LINES_ADJACENCY, 
+        GL_TRIANGLE_STRIP, 
+        GL_TRIANGLE_FAN, 
+        GL_TRIANGLES, 
+        GL_TRIANGLE_STRIP_ADJACENCY, 
+        GL_TRIANGLES_ADJACENCY
+        GL_PATCHES
+    */
+
     const render = () => {
 
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -71,15 +105,15 @@ document.addEventListener("DOMContentLoaded", () => {
         background.render(time);
 
         const mX = movementX;
-        const mY = movementY;        
+        const mY = movementY;
         
         if (!pressed) {
             terrain.angle.y -= (0.0025);
         } else {
-            terrain.angle.x += mX;            
+            terrain.angle.x += mX;
             terrain.angle.y += mY; 
         }
-        terrain.render(time, mouse);
+        terrain.render(time, mouse, renderMode);
 
         if (!pressed) {
             ocean.angle.y -= (0.0025);
@@ -87,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ocean.angle.x += mX;            
             ocean.angle.y += mY;
         }
-        ocean.render(time, mouse);
+        ocean.render(time, mouse, renderMode);
 
         if (!pressed) {
             clouds.angle.y -= (0.0025);
@@ -95,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
             clouds.angle.x += mX;            
             clouds.angle.y += mY;
         }
-        clouds.render(time, mouse);
+        clouds.render(time, mouse, renderMode);
 
         movementX -= mX;
         movementY -= mY;
