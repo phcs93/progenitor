@@ -2,6 +2,10 @@
     --background: #1E1E1E;
 }
 
+body[data-hud="false"] div {
+    display: none !important;
+}
+
 body {
     margin: 0px;
     padding: 0px;
@@ -17,14 +21,89 @@ canvas:active {
     cursor: grabbing;
 }
 
-div#controlls {
-    /* background-color: var(--background); */
-    width: 256px;
-    height: 256px;
+* {
+    font-family: 'Segoe UI';
+    color: lightgray;
+}
+
+hr {
+    margin-top: 0px;
+    border-color: gray;
+}
+
+input {
+    width: 100%;
+}
+
+label {
     display: block;
+    font-family: 'Candara';
+    font-size: 14px;
+    font-weight: bold;
+    height: 32px;
+    line-height: 32px;
+}
+
+select {
+    width: 100%;
+    background-color: #0E0E0E;
+    border: 1px solid black;
+    border-radius: 5px;
+    height: 32px;
+    padding-left: 8px;
+    line-height: 32px;
+    font-weight: bold;
+}
+
+input[type="text"]  {
+    width: 100%;
+    background-color: #0E0E0E;
+    border: 1px solid black;
+    border-radius: 5px;
+    height: 32px;
+    padding-left: 8px;
+    line-height: 32px;
+    font-weight: bold;
+}
+
+input[type="checkbox"] {
+    height: 32px;
+    width: 16px;
+    margin: 0px 8px 0px 0px;
+    padding: 0px;
+    cursor: pointer;
+}
+
+input[type="checkbox"] + label {
+    cursor: pointer;
+}
+
+input[type="range"] {
+    cursor: pointer;
+}
+
+div.controlls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(256px, 1fr));
+    grid-gap: 16px;
+    background-color: var(--background);
     position: fixed;
     top: 0;
-    margin: 32px;
+    margin: 16px;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: black 0px 0px 5px;
+}
+
+div#controlls-left {
+    margin: 16px;
+    padding: 16px;
+}
+
+div#controlls-right {
+    right: 0;
+    margin: 16px;
+    padding: 16px;
 }
 
 div#gradient {

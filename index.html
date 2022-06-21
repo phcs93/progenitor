@@ -36,26 +36,67 @@
         <script type="application/javascript" src="index.js"></script>
 
     </head>
-
-    <body>        
+    
+    <body data-hud="false">
         <canvas></canvas>
-        <div id="controlls">
-            <select id="render-mode">
-                <option value="POINTS">POINTS</option>
-                <option value="LINE_STRIP">LINE_STRIP</option>
-                <option value="LINE_LOOP">LINE_LOOP</option>
-                <option value="LINES">LINES</option>
-                <option value="LINE_STRIP_ADJACENCY">LINE_STRIP_ADJACENCY</option>
-                <option value="LINES_ADJACENCY">LINES_ADJACENCY</option>
-                <option value="TRIANGLE_STRIP">TRIANGLE_STRIP</option>
-                <option value="TRIANGLE_FAN">TRIANGLE_FAN</option>
-                <option value="TRIANGLES" selected>TRIANGLES</option>
-                <option value="TRIANGLE_STRIP_ADJACENCY">TRIANGLE_STRIP_ADJACENCY</option>
-                <option value="TRIANGLES_ADJACENCY">TRIANGLES_ADJACENCY</option>
-                <option value="PATCHES">PATCHES</option>
-            </select>
+        <div class="controlls" id="controlls-left">
+            <div>
+                <label for="seed">SEED</label>            
+                <input type="text" id="seed" name="seed" />
+            </div>
+            <div>
+                <label>TERRAIN</label>
+                <hr>
+            </div>  
+            <div>
+                <input type="checkbox" name="terrain-visible" id="terrain-visible" style="float: left;" checked>
+                <label for="terrain-visible" style="float: left;">VISIBLE</label>
+            </div>
+            <div>
+                <label>OCEAN</label>
+                <hr>
+            </div>
+            <div>
+                <input type="checkbox" name="ocean-visible" id="ocean-visible" style="float: left;" checked>
+                <label for="ocean-visible" style="float: left;">VISIBLE</label>
+            </div>
+            <div>
+                <label for="ocean-radius">OCEAN LEVEL</label>
+                <input type="range" id="ocean-radius" min="0.1" max="2.0" step="0.01" />
+            </div>
+            <div>
+                <label>CLOUDS</label>
+                <hr>
+            </div>
+            <div>
+                <input type="checkbox" name="clouds-visible" id="clouds-visible" style="float: left;" checked>
+                <label for="clouds-visible" style="float: left;">VISIBLE</label>
+            </div>
+        </div>        
+        <div class="controlls" id="controlls-right">
+            <div>
+                <label>ENGINE</label>
+                <hr>
+            </div>
+            <div>
+                <label for="render-mode">RENDER MODE</label>            
+                <select id="render-mode" name="render-mode">
+                    <option value="POINTS">POINTS</option>
+                    <option value="LINE_STRIP">LINE_STRIP</option>
+                    <option value="LINE_LOOP">LINE_LOOP</option>
+                    <option value="LINES">LINES</option>
+                    <option value="LINE_STRIP_ADJACENCY">LINE_STRIP_ADJACENCY</option>
+                    <option value="LINES_ADJACENCY">LINES_ADJACENCY</option>
+                    <option value="TRIANGLE_STRIP">TRIANGLE_STRIP</option>
+                    <option value="TRIANGLE_FAN">TRIANGLE_FAN</option>
+                    <option value="TRIANGLES" selected>TRIANGLES</option>
+                    <option value="TRIANGLE_STRIP_ADJACENCY">TRIANGLE_STRIP_ADJACENCY</option>
+                    <option value="TRIANGLES_ADJACENCY">TRIANGLES_ADJACENCY</option>
+                    <option value="PATCHES">PATCHES</option>
+                </select>
+            </div>
         </div>
-        <div id="gradient"></div>
+        <div id="gradient"></div>        
     </body>
 
 </html>

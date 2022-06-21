@@ -13,15 +13,17 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     this.directionalLightColor = {r: 1.0,  g: 1.0, b: 1.0};
     this.directionalLightDirection = {x: 1.0, y: 0.0, z: 1.0};
 
-    const permutaion = createPermutationTable(seed);
+    this.radius = seed;
+
+    let permutaion = createPermutationTable(seed);
     const simplex = createSimplexVectors();
     const tesseract = createTesseractVectors();
 
-    const breakpoints = createBreakpoints(seed);
+    let breakpoints = createBreakpoints(seed);
     this.breakpoints = breakpoints; // oh no
-    const gradient = createGradient(breakpoints, resolution);
+    let gradient = createGradient(breakpoints, resolution);
 
-    const alphaCallback = alpha ? () => gl.enable(gl.BLEND) : () => gl.disable(gl.BLEND);
+    const alphaCallback = alpha ? () => gl.enable(gl.BLEND) : () => gl.disable(gl.BLEND);    
 
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -49,6 +51,33 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
     const ambientLightColorLocation = gl.getUniformLocation(program, "ambientLightColor");
     const directionalLightColorLocation = gl.getUniformLocation(program, "directionalLightColor");
     const directionalLightDirectionLocation = gl.getUniformLocation(program, "directionalLightDirection");
+    
+    const radiusLocation = gl.getUniformLocation(program, "radius");
+
+    let drawElementsCallback = (mode) => gl.drawElements(mode, indexes.length, gl.UNSIGNED_INT, 0);
+
+    this.visible = (visible) => {
+        if (visible) {
+            drawElementsCallback = (mode) => gl.drawElements(mode, indexes.length, gl.UNSIGNED_INT, 0);
+        } else {
+            drawElementsCallback = () => {};
+        }
+    };
+
+    this.seed = (newSeed) => {
+        
+        // shape
+        permutaion = createPermutationTable(newSeed);
+        
+        // colors
+        breakpoints = createBreakpoints(newSeed);
+        this.breakpoints = breakpoints; // oh no
+        gradient = createGradient(breakpoints, resolution);
+
+        // size
+        this.radius = newSeed;
+
+    };
 
     this.render = (time, mouse, mode = gl.TRIANGLES) => {
         
@@ -134,7 +163,9 @@ function Sphere (resolution, seed, gl, vertex, fragment, alpha = false) {
         gl.uniform3f(directionalLightColorLocation, this.directionalLightColor.r, this.directionalLightColor.g, this.directionalLightColor.b);
         gl.uniform3f(directionalLightDirectionLocation, this.directionalLightDirection.x, this.directionalLightDirection.y, this.directionalLightDirection.z);
         
-        gl.drawElements(mode, indexes.length, gl.UNSIGNED_INT, 0);
+        gl.uniform1f(radiusLocation, this.radius);
+
+        drawElementsCallback(mode);        
 
     };
 

@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const bot = url.searchParams.get("bot");
     const seed = parseFloat(url.searchParams.get("seed")) || Math.random();
 
+    document.getElementById("seed").value = seed;
+
     const canvas = document.querySelector("canvas");
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
@@ -14,7 +16,22 @@ document.addEventListener("DOMContentLoaded", () => {
     let movementX = 0;
     let movementY = 0;
 
-    window.addEventListener("mousemove", e => {
+    document.onkeydown  = e => {
+        if (e.key === "Tab") {
+            e.preventDefault();
+            document.body.dataset.hud = !JSON.parse(document.body.dataset.hud);            
+        }
+    };
+
+    canvas.onwheel = e => {
+        if (e.deltaY > 0) {
+            // down
+        } else {
+            // up
+        }
+    };    
+
+    canvas.onmousemove = e => {
         const mouseX = (e.offsetX / canvas.clientWidth) * 2 - 1;
         const mouseY = ((canvas.clientHeight - e.offsetY) / canvas.clientHeight) * 2 - 1;
         mouse[0] = mouseX;
@@ -23,15 +40,15 @@ document.addEventListener("DOMContentLoaded", () => {
             movementY += e.movementX/512;
             movementX += e.movementY/512;
         }
-    });
+    };
 
-    window.addEventListener("mousedown", e => {
+    canvas.onmousedown = () => {
         pressed = true;
-    });
+    };
 
-    window.addEventListener("mouseup", e => {
+    canvas.onmouseup = () => {
         pressed = false;
-    });    
+    };    
 
     const gl = canvas.getContext("webgl2", {
         preserveDrawingBuffer: true,
@@ -42,8 +59,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let renderMode = gl.TRIANGLES;
 
-    document.getElementById("render-mode").onchange = function() {
-        switch (this.value) {
+    document.getElementById("render-mode").onchange = e => {
+        switch (e.target.value) {
             case "POINTS": renderMode = gl.POINTS; break;
             case "LINE_STRIP": renderMode = gl.LINE_STRIP; break;
             case "LINE_LOOP": renderMode = gl.LINE_LOOP; break;
@@ -57,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
             case "TRIANGLES_ADJACENCY": renderMode = gl.TRIANGLES_ADJACENCY; break;
             case "PATCHES": renderMode = gl.PATCHES; break;
         }
-    };
+    };    
 
     let time = 0.0;
     let last = (Date.now() / 1000);
@@ -76,20 +93,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const ocean = new Sphere(resolution, seed, gl, oceanVertexShaderSource, fragmentShaderSource, true);
     const clouds = new Sphere(resolution, seed, gl, cloudsVertexShaderSource, fragmentShaderSource, true);
 
-    /*
-        GL_POINTS, 
-        GL_LINE_STRIP, 
-        GL_LINE_LOOP, 
-        GL_LINES, 
-        GL_LINE_STRIP_ADJACENCY, 
-        GL_LINES_ADJACENCY, 
-        GL_TRIANGLE_STRIP, 
-        GL_TRIANGLE_FAN, 
-        GL_TRIANGLES, 
-        GL_TRIANGLE_STRIP_ADJACENCY, 
-        GL_TRIANGLES_ADJACENCY
-        GL_PATCHES
-    */
+    document.getElementById("seed").oninput = e => {
+        terrain.seed(e.target.value);
+        ocean.seed(e.target.value);
+        clouds.seed(e.target.value);
+    };
+
+    document.getElementById("terrain-visible").oninput = e => {
+        terrain.visible(e.target.checked);
+    };
+
+    document.getElementById("ocean-visible").oninput = e => {
+        ocean.visible(e.target.checked);
+    };
+
+    document.getElementById("clouds-visible").oninput = e => {
+        clouds.visible(e.target.checked);
+    };
+
+    document.getElementById("ocean-radius").oninput = e => {
+        ocean.radius = e.target.value;
+    };
 
     const render = () => {
 
@@ -154,8 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const reanderGradientHTML = breakpoints => {
 
         const element = document.getElementById("gradient");
-
-        console.log(breakpoints);
 
         element.style.background = `linear-gradient(to right,
             ${breakpoints.map(c => `

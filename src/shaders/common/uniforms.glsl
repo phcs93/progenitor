@@ -11,4 +11,6 @@ const uniformsSource = `
     uniform vec3 directionalLightColor;
     uniform vec3 directionalLightDirection;
 
+    uniform float radius;
+
 `;
