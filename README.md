@@ -1,8 +1,8 @@
-# Genesis
+# Progenitor
 Procedural planet generation with WebGL.
 
 # DEMO
-https://phcs93.github.io/genesis/
+https://phcs93.github.io/progenitor/
 
 # BUGS
 * derivative normals are not correct
